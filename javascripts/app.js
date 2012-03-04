@@ -1976,7 +1976,8 @@
         _this = this;
       transform_properties = {
         '-webkit-transform-origin': '50% top 0',
-        '-webkit-transform': 'rotateX(' + rotate_x + 'deg)'
+        '-webkit-transform': 'rotateX(' + rotate_x + 'deg)',
+        'padding-bottom': height
       };
       if (animated) {
         return this.el.animate(transform_properties, {
