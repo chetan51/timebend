@@ -1946,9 +1946,16 @@
 
     __extends(TaskItem, _super);
 
+    TaskItem.prototype.events = {
+      "tap input[type='text']": "editName",
+      "focusout input[type='text']": "updateName"
+    };
+
     function TaskItem() {
       this.remove = __bind(this.remove, this);
+      this.updateName = __bind(this.updateName, this);
       this.editName = __bind(this.editName, this);
+      this.startEditingName = __bind(this.startEditingName, this);
       this.updateTransform = __bind(this.updateTransform, this);
       this.transformed = __bind(this.transformed, this);
       this.transforming = __bind(this.transforming, this);
@@ -1957,6 +1964,7 @@
       if (!this.item) throw "@item required";
       this.item.bind("update", this.render);
       this.item.bind("destroy", this.remove);
+      this.item.controller = this;
     }
 
     TaskItem.prototype.template = function(item) {
@@ -1968,8 +1976,6 @@
     TaskItem.prototype.render = function(item) {
       if (item) this.item = item;
       this.html(this.template(this.item));
-      this.item.controller = this;
-      this.el.find(".task").data('id', this.item.id);
       return this;
     };
 
@@ -1995,18 +2001,38 @@
         '-webkit-transform': 'rotateX(' + rotate_x + 'deg)'
       };
       if (animated) {
-        return this.el.animate(transform_properties, {
-          complete: function() {
-            if (callback) return callback();
-          }
-        });
+        if (this.el.css('-webkit-transform') === 'rotateX(' + rotate_x + 'deg)') {
+          return callback && callback();
+        } else {
+          return this.el.animate(transform_properties, {
+            complete: function() {
+              return callback && callback();
+            }
+          });
+        }
       } else {
         return this.el.css(transform_properties);
       }
     };
 
-    TaskItem.prototype.editName = function() {
+    TaskItem.prototype.startEditingName = function() {
+      this.el.find('input').val("");
       return this.el.find('input').focus();
+    };
+
+    TaskItem.prototype.editName = function(event) {
+      return event.target.focus();
+    };
+
+    TaskItem.prototype.updateName = function(event) {
+      var name;
+      name = $(event.target).val();
+      if (name.length) {
+        this.item.name = name;
+        return this.item.save();
+      } else {
+        return this.item.destroy();
+      }
     };
 
     TaskItem.prototype.remove = function() {
@@ -2038,15 +2064,8 @@
       "#after-todo": "after_todo"
     };
 
-    Tasks.prototype.events = {
-      "tap .task input": "editTaskName",
-      "focusout .task input": "updateTaskName"
-    };
-
     function Tasks() {
       this.watchForNewTaskGesture = __bind(this.watchForNewTaskGesture, this);
-      this.updateTaskName = __bind(this.updateTaskName, this);
-      this.editTaskName = __bind(this.editTaskName, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);      Tasks.__super__.constructor.apply(this, arguments);
@@ -2078,18 +2097,6 @@
 
     Tasks.prototype.addAll = function() {
       return Task.each(this.addOne);
-    };
-
-    Tasks.prototype.editTaskName = function(event) {
-      return event.target.focus();
-    };
-
-    Tasks.prototype.updateTaskName = function(event) {
-      var task, task_id;
-      task_id = $(event.target).closest(".task").data('id');
-      task = Task.find(task_id);
-      task.name = $(event.target).val();
-      return task.save();
     };
 
     Tasks.prototype.watchForNewTaskGesture = function() {
@@ -2141,7 +2148,6 @@
         }
       });
       return this.new_task.bind('touchend', function(event) {
-        console.log(_this.create);
         if (_this.create) {
           _this.after_todo.animate({
             '-webkit-transform': 'translateY(' + _this.translate_y + 'px)'
@@ -2157,7 +2163,7 @@
               return reset();
             }
           });
-          return _this.task.controller.editName();
+          return _this.task.controller.startEditingName();
         } else {
           _this.rotate_x = -90;
           _this.translate_y = 0;
@@ -2168,7 +2174,6 @@
             '-webkit-transform': 'translateY(0)'
           });
           return _this.task.controller.updateTransform(_this.rotate_x, true, function() {
-            console.log("destroying");
             _this.task.destroy();
             return reset();
           });

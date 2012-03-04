@@ -16,15 +16,8 @@
       "#after-todo": "after_todo"
     };
 
-    Tasks.prototype.events = {
-      "tap .task input": "editTaskName",
-      "focusout .task input": "updateTaskName"
-    };
-
     function Tasks() {
       this.watchForNewTaskGesture = __bind(this.watchForNewTaskGesture, this);
-      this.updateTaskName = __bind(this.updateTaskName, this);
-      this.editTaskName = __bind(this.editTaskName, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);      Tasks.__super__.constructor.apply(this, arguments);
@@ -56,18 +49,6 @@
 
     Tasks.prototype.addAll = function() {
       return Task.each(this.addOne);
-    };
-
-    Tasks.prototype.editTaskName = function(event) {
-      return event.target.focus();
-    };
-
-    Tasks.prototype.updateTaskName = function(event) {
-      var task, task_id;
-      task_id = $(event.target).closest(".task").data('id');
-      task = Task.find(task_id);
-      task.name = $(event.target).val();
-      return task.save();
     };
 
     Tasks.prototype.watchForNewTaskGesture = function() {
@@ -119,7 +100,6 @@
         }
       });
       return this.new_task.bind('touchend', function(event) {
-        console.log(_this.create);
         if (_this.create) {
           _this.after_todo.animate({
             '-webkit-transform': 'translateY(' + _this.translate_y + 'px)'
@@ -135,7 +115,7 @@
               return reset();
             }
           });
-          return _this.task.controller.editName();
+          return _this.task.controller.startEditingName();
         } else {
           _this.rotate_x = -90;
           _this.translate_y = 0;
@@ -146,7 +126,6 @@
             '-webkit-transform': 'translateY(0)'
           });
           return _this.task.controller.updateTransform(_this.rotate_x, true, function() {
-            console.log("destroying");
             _this.task.destroy();
             return reset();
           });

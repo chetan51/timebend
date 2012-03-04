@@ -8,9 +8,16 @@
 
     __extends(TaskItem, _super);
 
+    TaskItem.prototype.events = {
+      "tap input[type='text']": "editName",
+      "focusout input[type='text']": "updateName"
+    };
+
     function TaskItem() {
       this.remove = __bind(this.remove, this);
+      this.updateName = __bind(this.updateName, this);
       this.editName = __bind(this.editName, this);
+      this.startEditingName = __bind(this.startEditingName, this);
       this.updateTransform = __bind(this.updateTransform, this);
       this.transformed = __bind(this.transformed, this);
       this.transforming = __bind(this.transforming, this);
@@ -19,6 +26,7 @@
       if (!this.item) throw "@item required";
       this.item.bind("update", this.render);
       this.item.bind("destroy", this.remove);
+      this.item.controller = this;
     }
 
     TaskItem.prototype.template = function(item) {
@@ -30,8 +38,6 @@
     TaskItem.prototype.render = function(item) {
       if (item) this.item = item;
       this.html(this.template(this.item));
-      this.item.controller = this;
-      this.el.find(".task").data('id', this.item.id);
       return this;
     };
 
@@ -57,18 +63,38 @@
         '-webkit-transform': 'rotateX(' + rotate_x + 'deg)'
       };
       if (animated) {
-        return this.el.animate(transform_properties, {
-          complete: function() {
-            if (callback) return callback();
-          }
-        });
+        if (this.el.css('-webkit-transform') === 'rotateX(' + rotate_x + 'deg)') {
+          return callback && callback();
+        } else {
+          return this.el.animate(transform_properties, {
+            complete: function() {
+              return callback && callback();
+            }
+          });
+        }
       } else {
         return this.el.css(transform_properties);
       }
     };
 
-    TaskItem.prototype.editName = function() {
+    TaskItem.prototype.startEditingName = function() {
+      this.el.find('input').val("");
       return this.el.find('input').focus();
+    };
+
+    TaskItem.prototype.editName = function(event) {
+      return event.target.focus();
+    };
+
+    TaskItem.prototype.updateName = function(event) {
+      var name;
+      name = $(event.target).val();
+      if (name.length) {
+        this.item.name = name;
+        return this.item.save();
+      } else {
+        return this.item.destroy();
+      }
     };
 
     TaskItem.prototype.remove = function() {
