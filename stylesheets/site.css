@@ -45,6 +45,10 @@ a img {
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
   display: block; }
 
+html, body {
+  height: 100%;
+  overflow: hidden; }
+
 body {
   width: 100%;
   padding: 0;
@@ -59,8 +63,9 @@ a {
   text-decoration: none; }
 
 #wrapper {
-  overflow-x: hidden;
-  overflow-y: scroll; }
+  height: 100%;
+  overflow: auto;
+  overflow-x: hidden; }
 
 #check, #cross {
   display: block;
