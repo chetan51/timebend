@@ -12,7 +12,8 @@
       this.remove = __bind(this.remove, this);
       this.editName = __bind(this.editName, this);
       this.updateTransform = __bind(this.updateTransform, this);
-      this.updateHeight = __bind(this.updateHeight, this);
+      this.transformed = __bind(this.transformed, this);
+      this.transforming = __bind(this.transforming, this);
       this.render = __bind(this.render, this);
       this.template = __bind(this.template, this);      TaskItem.__super__.constructor.apply(this, arguments);
       if (!this.item) throw "@item required";
@@ -34,9 +35,17 @@
       return this;
     };
 
-    TaskItem.prototype.updateHeight = function(height) {
+    TaskItem.prototype.transforming = function() {
       return this.el.css({
-        'height': height
+        'height': '0',
+        'z-index': '-1'
+      });
+    };
+
+    TaskItem.prototype.transformed = function() {
+      return this.el.css({
+        'height': '60px',
+        'z-index': '1'
       });
     };
 

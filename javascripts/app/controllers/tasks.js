@@ -88,7 +88,7 @@
           duration: 1,
           name: "Pull to create task"
         });
-        _this.task.controller.updateHeight(0);
+        _this.task.controller.transforming();
         _this.rotate_x = -90;
         return _this.task.controller.updateTransform(_this.rotate_x);
       });
@@ -131,7 +131,7 @@
               _this.new_task.css({
                 '-webkit-transform': 'translateY(0)'
               });
-              _this.task.controller.updateHeight(_this.translate_y);
+              _this.task.controller.transformed();
               return reset();
             }
           });
