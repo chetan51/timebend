@@ -2091,7 +2091,8 @@
         _this.touch_start.x = event.touches[0].pageX;
         _this.touch_start.y = event.touches[0].pageY;
         _this.task = Task.create({
-          duration: 1
+          duration: 1,
+          name: "Pull to create task"
         });
         _this.rotate_x = -90;
         return _this.task.controller.updateTransform(_this.rotate_x, _this.height);
@@ -2105,13 +2106,18 @@
         _this.height = dy < 60 ? dy : 60;
         _this.task.controller.updateTransform(_this.rotate_x, _this.height);
         if (_this.rotate_x === 0) {
-          _this.task.name = "Release to create";
-          _this.create = true;
+          if (!_this.create) {
+            _this.task.name = "Release to create task";
+            _this.create = true;
+            return _this.task.save();
+          }
         } else {
-          _this.task.name = "Pull to create";
-          _this.create = false;
+          if (_this.create) {
+            _this.task.name = "Pull to create task";
+            _this.create = false;
+            return _this.task.save();
+          }
         }
-        return _this.task.save();
       });
       return this.new_task.bind('touchend', function(event) {
         if (_this.create) {

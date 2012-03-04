@@ -104,10 +104,12 @@ a {
     line-height: 58px;
     border-top: 1px solid rgba(255, 255, 255, 0.07);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    position: relative; }
+    position: relative;
+    padding-right: 70px; }
   .task .name, #new-task .name, #clear-tasks .name {
     display: inline-block;
-    position: relative; }
+    position: relative;
+    width: 100%; }
     .task .name span, #new-task .name span, #clear-tasks .name span {
       position: absolute;
       z-index: 2;
@@ -124,6 +126,7 @@ a {
       -webkit-transition: -webkit-transform 0 cubic-bezier(0, 0, 0.2, 1);
       -webkit-transform: scaleX(0); }
   .task input[type="text"], #new-task input[type="text"], #clear-tasks input[type="text"] {
+    width: 100%;
     border: none;
     background: transparent;
     color: #fff;
@@ -150,7 +153,7 @@ a {
   .task.done {
     background-color: #111 !important;
     color: #555; }
-    .task.done .name input {
+    .task.done .name input[type="text"] {
       color: #555;
       text-decoration: line-through;
       -webkit-transform: scaleX(1) !important; }
