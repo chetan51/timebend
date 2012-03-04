@@ -1,0 +1,166 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline; }
+
+body {
+  line-height: 1; }
+
+ol, ul {
+  list-style: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle; }
+
+q, blockquote {
+  quotes: none; }
+  q:before, q:after, blockquote:before, blockquote:after {
+    content: "";
+    content: none; }
+
+a img {
+  border: none; }
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
+  display: block; }
+
+body {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  overflow-x: hidden; }
+
+a {
+  color: #fff;
+  text-decoration: none; }
+
+#wrapper {
+  overflow-x: hidden;
+  overflow-y: scroll; }
+
+#check, #cross {
+  display: block;
+  width: 55px;
+  height: 60px;
+  position: absolute;
+  -webkit-transition: opacity 0 cubic-bezier(0, 0, 0.2, 1), -webkit-transform 0 cubic-bezier(0, 0, 0.2, 1);
+  -webkit-perspective: 0;
+  -webkit-backface-visibility: hidden;
+  display: none; }
+
+#templates {
+  display: none; }
+
+#check {
+  left: 0; }
+
+#cross {
+  right: 0; }
+
+#todo, #done {
+  width: 100%;
+  top: 0;
+  left: 0;
+  -webkit-transition: -webkit-transform .15s ease, opacity .15s ease;
+  -webkit-perspective: 1000;
+  -webkit-backface-visibility: hidden; }
+
+.task, #new-task, #clear-tasks {
+  height: 60px;
+  -webkit-user-select: none;
+  -webkit-transition: all .1s ease;
+  -webkit-perspective: 0;
+  -webkit-backface-visibility: hidden;
+  position: relative; }
+  .task .inner, #new-task .inner, #clear-tasks .inner {
+    height: 58px;
+    padding: 0 10px;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 58px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative; }
+  .task .name, #new-task .name, #clear-tasks .name {
+    display: inline-block;
+    position: relative; }
+    .task .name span, #new-task .name span, #clear-tasks .name span {
+      position: absolute;
+      z-index: 2;
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: #fff;
+      left: 0;
+      top: 52%;
+      -webkit-user-select: none;
+      -webkit-perspective: 0;
+      -webkit-backface-visibility: hidden;
+      -webkit-transform-origin: 0%;
+      -webkit-transition: -webkit-transform 0 cubic-bezier(0, 0, 0.2, 1);
+      -webkit-transform: scaleX(0); }
+  .task input[type="text"], #new-task input[type="text"], #clear-tasks input[type="text"] {
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    left: -1px; }
+
+.task {
+  background-color: #0086F3; }
+  .task .duration {
+    position: absolute;
+    right: 0;
+    top: -1px;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    background-color: rgba(255, 255, 255, 0.15); }
+  .task.green {
+    background-color: #00AA33 !important; }
+  .task.done {
+    background-color: #111 !important;
+    color: #555; }
+    .task.done .name input {
+      color: #555;
+      text-decoration: line-through;
+      -webkit-transform: scaleX(1) !important; }
+
+#new-task, #clear-tasks {
+  color: #777;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 60px; }
+
+#clear-tasks {
+  border-bottom: 1px solid #222; }

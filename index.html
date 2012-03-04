@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/Article">
+	<head>
+		<meta charset=utf-8>
+
+		<!-- Header tags for iPhone -->
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+		<title>Checkpoint Timer</title>
+
+		<meta property="og:title" content="Checkpoint Timer" />
+		<meta property="og:description" content="Timer app for the Checkpoint Method, a productivity tactic to supercharge your day." /> 
+		<meta property="og:image" content="http://checkpointtimer.com/apple-touch-icon.png" />
+
+		<meta itemprop="name" content="Checkpoint Timer" />
+		<meta itemprop="description" content="Timer app for the Checkpoint Method, a productivity tactic to supercharge your day." /> 
+		<meta itemprop="image" content="http://checkpointtimer.com/apple-touch-icon.png" />
+
+    <link href="/stylesheets/site.css" media="screen" rel="stylesheet" type="text/css" />
+    <script src="/javascripts/lib/zepto.js" type="text/javascript"></script>
+    <script src="/javascripts/lib/underscore-min.js" type="text/javascript"></script>
+    <script src="/javascripts/app.js" type="text/javascript"></script>
+    
+    <script src="/javascripts/lib/phantom-limb.js" type="text/javascript"></script>
+    
+		<script type="text/javascript" charset="utf-8">
+			$('document').ready(function(){
+				window.app = new App({el: $("body")});      
+
+        // For testing
+        phantom(this);
+			});
+		</script>
+
+		<script type="text/javascript">
+
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-27737402-1']);
+			_gaq.push(['_trackPageview']);
+
+			(function() {
+			 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			 })();
+
+		</script>
+    
+      <title>Checkpoint Timer</title>
+
+	</head>
+<body class="index">
+  
+<img id="check" src="images/check.png"/>
+<img id="cross" src="images/cross.png"/>
+<div id="wrapper">
+  <div id="tasks">
+    <div id="todo"></div>
+    <div id="new-task">&darr;&nbsp; new task</div>
+    <div id="done"></div>
+    <div id="clear-tasks">&uarr;&nbsp; clear</div>
+  </div>
+</div>
+
+<div id="templates">
+  <div id="task-template">
+  <div class="task{{ if(task.done) print(' done'); }}">
+    <div class="inner">
+      <div class="name"><input type="text" value="{{= task.name }}"></div>
+      <div class="duration">{{= task.duration }}</div>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
