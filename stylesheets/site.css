@@ -95,7 +95,8 @@ a {
   -webkit-transition: all .1s ease;
   -webkit-perspective: 0;
   -webkit-backface-visibility: hidden;
-  position: relative; }
+  position: relative;
+  z-index: -1; }
   .task .inner {
     height: 58px;
     padding: 0 10px;

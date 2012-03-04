@@ -2112,6 +2112,7 @@
         _this.rotate_x = dy > 0 ? -90 + dy : -90;
         _this.rotate_x = _this.rotate_x < 0 ? _this.rotate_x : 0;
         _this.translate_y = dy < 60 ? dy : 60;
+        _this.translate_y = _this.translate_y > 0 ? _this.translate_y : 0;
         _this.task.controller.updateTransform(_this.rotate_x);
         _this.new_task.css({
           '-webkit-transform': 'translateY(' + _this.translate_y + 'px)'
@@ -2131,6 +2132,7 @@
         }
       });
       return this.new_task.bind('touchend', function(event) {
+        console.log(_this.create);
         if (_this.create) {
           _this.after_todo.animate({
             '-webkit-transform': 'translateY(' + _this.translate_y + 'px)'
@@ -2157,6 +2159,7 @@
             '-webkit-transform': 'translateY(0)'
           });
           return _this.task.controller.updateTransform(_this.rotate_x, true, function() {
+            console.log("destroying");
             _this.task.destroy();
             return reset();
           });
