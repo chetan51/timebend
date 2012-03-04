@@ -12,7 +12,8 @@
       "#todo": "todo",
       "#done": "done",
       "#new-task": "new_task",
-      "#clear-tasks": "clear_tasks"
+      "#clear-tasks": "clear_tasks",
+      "#after-todo": "after_todo"
     };
 
     Tasks.prototype.events = {
@@ -76,7 +77,7 @@
         _this.touch_start = {};
         _this.task = null;
         _this.rotate_x = 0;
-        _this.height = 0;
+        _this.translate_y = 0;
         return _this.create = false;
       };
       reset();
@@ -87,8 +88,9 @@
           duration: 1,
           name: "Pull to create task"
         });
+        _this.task.controller.updateHeight(0);
         _this.rotate_x = -90;
-        return _this.task.controller.updateTransform(_this.rotate_x, _this.height);
+        return _this.task.controller.updateTransform(_this.rotate_x);
       });
       this.new_task.bind('touchmove', function(event) {
         var dy;
@@ -96,8 +98,11 @@
         dy = event.touches[0].pageY - _this.touch_start.y;
         _this.rotate_x = dy > 0 ? -90 + dy : -90;
         _this.rotate_x = _this.rotate_x < 0 ? _this.rotate_x : 0;
-        _this.height = dy < 60 ? dy : 60;
-        _this.task.controller.updateTransform(_this.rotate_x, _this.height);
+        _this.translate_y = dy < 60 ? dy : 60;
+        _this.task.controller.updateTransform(_this.rotate_x);
+        _this.new_task.css({
+          '-webkit-transform': 'translateY(' + _this.translate_y + 'px)'
+        });
         if (_this.rotate_x === 0) {
           if (!_this.create) {
             _this.task.name = "Release to create task";
@@ -114,12 +119,31 @@
       });
       return this.new_task.bind('touchend', function(event) {
         if (_this.create) {
-          _this.task.controller.editName();
-          return reset();
+          _this.after_todo.animate({
+            '-webkit-transform': 'translateY(' + _this.translate_y + 'px)'
+          }, {
+            complete: function() {
+              _this.after_todo.css({
+                '-webkit-transform': 'translateY(0)'
+              });
+              _this.new_task.css({
+                '-webkit-transform': 'translateY(0)'
+              });
+              _this.task.controller.updateHeight(_this.translate_y);
+              return reset();
+            }
+          });
+          return _this.task.controller.editName();
         } else {
           _this.rotate_x = -90;
-          _this.height = 0;
-          return _this.task.controller.updateTransform(_this.rotate_x, _this.height, true, function() {
+          _this.translate_y = 0;
+          _this.after_todo.animate({
+            '-webkit-transform': 'translateY(0)'
+          });
+          _this.new_task.animate({
+            '-webkit-transform': 'translateY(0)'
+          });
+          return _this.task.controller.updateTransform(_this.rotate_x, true, function() {
             _this.task.destroy();
             return reset();
           });

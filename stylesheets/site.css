@@ -45,10 +45,6 @@ a img {
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
   display: block; }
 
-html, body {
-  height: 100%;
-  overflow: hidden; }
-
 body {
   width: 100%;
   padding: 0;
@@ -63,9 +59,8 @@ a {
   text-decoration: none; }
 
 #wrapper {
-  height: 100%;
-  overflow: auto;
-  overflow-x: hidden; }
+  overflow-x: hidden;
+  overflow-y: scroll; }
 
 #check, #cross {
   display: block;
@@ -94,14 +89,14 @@ a {
   -webkit-perspective: 1000;
   -webkit-backface-visibility: hidden; }
 
-.task, #new-task, #clear-tasks {
+.task {
   height: 60px;
   -webkit-user-select: none;
   -webkit-transition: all .1s ease;
   -webkit-perspective: 0;
   -webkit-backface-visibility: hidden;
   position: relative; }
-  .task .inner, #new-task .inner, #clear-tasks .inner {
+  .task .inner {
     height: 58px;
     padding: 0 10px;
     font-size: 18px;
@@ -111,11 +106,11 @@ a {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     position: relative;
     padding-right: 70px; }
-  .task .name, #new-task .name, #clear-tasks .name {
+  .task .name {
     display: inline-block;
     position: relative;
     width: 100%; }
-    .task .name span, #new-task .name span, #clear-tasks .name span {
+    .task .name span {
       position: absolute;
       z-index: 2;
       display: block;
@@ -130,7 +125,7 @@ a {
       -webkit-transform-origin: 0%;
       -webkit-transition: -webkit-transform 0 cubic-bezier(0, 0, 0.2, 1);
       -webkit-transform: scaleX(0); }
-  .task input[type="text"], #new-task input[type="text"], #clear-tasks input[type="text"] {
+  .task input[type="text"] {
     width: 100%;
     border: none;
     background: transparent;
@@ -141,6 +136,18 @@ a {
     margin: 0;
     position: relative;
     left: -1px; }
+
+#new-task, #clear-tasks {
+  height: 60px;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #222222), color-stop(100%, #111111));
+  background-image: -webkit-linear-gradient(top, #222222, #111111);
+  background-image: -moz-linear-gradient(top, #222222, #111111);
+  background-image: -o-linear-gradient(top, #222222, #111111);
+  background-image: -ms-linear-gradient(top, #222222, #111111);
+  background-image: linear-gradient(top, #222222, #111111); }
+
+.buffer {
+  height: 60px; }
 
 .task {
   background-color: #0086F3; }
