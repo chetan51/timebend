@@ -119,7 +119,6 @@
           _this.task.save({
             silent: true
           });
-          console.log(_this.task_item.el);
           _this.after_todo.transition({
             y: _this.translate_y + 'px',
             complete: function() {

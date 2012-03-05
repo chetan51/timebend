@@ -2003,13 +2003,13 @@
       var transform_properties,
         _this = this;
       this.el.css({
-        '-webkit-transform-origin': '50% top 0'
+        transformOrigin: '50% 0'
       });
       transform_properties = {
         rotateX: rotate_x + 'deg'
       };
       if (animated) {
-        if (this.el.css('-webkit-transform') === 'rotateX(' + rotate_x + 'deg)') {
+        if (this.el.css('rotateX') === rotate_x + 'deg') {
           return callback && callback();
         } else {
           return this.el.transition(_.extend(transform_properties, {
@@ -2175,7 +2175,6 @@
           _this.task.save({
             silent: true
           });
-          console.log(_this.task_item.el);
           _this.after_todo.transition({
             y: _this.translate_y + 'px',
             complete: function() {
