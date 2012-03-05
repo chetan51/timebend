@@ -160,16 +160,7 @@
       if (this.touching && !this.hovering) {
         this.swiping = true;
         dx = dx > 0 ? dx : 0;
-        dx = dx < 60 ? dx : 60;
-        this.transformTranslateX(dx);
-        this.transformCheckmarkOpacity(dx / 60);
-        if (dx === 60) {
-          this.content.addClass("green");
-          return this.marked_done = true;
-        } else {
-          this.content.removeClass("green");
-          return this.marked_done = false;
-        }
+        return dx = dx < 60 ? dx : 60;
       }
     };
 
