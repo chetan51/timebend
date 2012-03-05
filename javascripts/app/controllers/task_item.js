@@ -177,7 +177,7 @@
       var dx, now;
       dx = this.last_touch.x - this.touch_start.x;
       now = new Date();
-      if ((!this.hovering) && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
+      if (this.touching && !this.hovering && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
         this.transformTranslateX(0);
         if (event.target === this.duration[0]) {
           this.toggleDuration();
