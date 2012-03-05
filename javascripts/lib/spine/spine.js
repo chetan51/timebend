@@ -25,9 +25,11 @@
       });
     },
     trigger: function() {
-      var args, callback, ev, list, _i, _len, _ref;
+      var args, callback, ev, list, options, _i, _len, _ref;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       ev = args.shift();
+      options = args[args.length - 1];
+      if (typeof options === 'object' && options.silent) return;
       list = this.hasOwnProperty('_callbacks') && ((_ref = this._callbacks) != null ? _ref[ev] : void 0);
       if (!list) return;
       for (_i = 0, _len = list.length; _i < _len; _i++) {

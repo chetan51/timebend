@@ -85,9 +85,11 @@
       });
     },
     trigger: function() {
-      var args, callback, ev, list, _i, _len, _ref;
+      var args, callback, ev, list, options, _i, _len, _ref;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       ev = args.shift();
+      options = args[args.length - 1];
+      if (typeof options === 'object' && options.silent) return;
       list = this.hasOwnProperty('_callbacks') && ((_ref = this._callbacks) != null ? _ref[ev] : void 0);
       if (!list) return;
       for (_i = 0, _len = list.length; _i < _len; _i++) {
@@ -2076,6 +2078,7 @@
       this["delete"] = __bind(this["delete"], this);
       this.watchForNewTaskGesture = __bind(this.watchForNewTaskGesture, this);
       this.addAll = __bind(this.addAll, this);
+      this.addTaskItemToList = __bind(this.addTaskItemToList, this);
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);      Tasks.__super__.constructor.apply(this, arguments);
       Task.bind("refresh", this.render);
@@ -2096,11 +2099,16 @@
     };
 
     Tasks.prototype.addOne = function(item) {
-      var el, list, task_item;
+      var list, task_item;
       task_item = new TaskItem({
         item: item
       });
       list = item.done ? this.done : this.todo;
+      return this.addTaskItemToList(task_item, list);
+    };
+
+    Tasks.prototype.addTaskItemToList = function(task_item, list) {
+      var el;
       el = task_item.render().el;
       return list.append(el);
     };
@@ -2115,6 +2123,7 @@
       reset = function() {
         _this.touch_start = {};
         _this.task = null;
+        _this.task_item = null;
         _this.rotate_x = 0;
         _this.translate_y = 0;
         return _this.create = false;
@@ -2123,13 +2132,17 @@
       this.new_task.bind('touchstart', function(event) {
         _this.touch_start.x = event.originalEvent.touches[0].pageX;
         _this.touch_start.y = event.originalEvent.touches[0].pageY;
-        _this.task = Task.create({
+        _this.task = Task.init({
           duration: 1,
           name: "Pull to create task"
         });
-        _this.task.controller.transforming();
+        _this.task_item = new TaskItem({
+          item: _this.task
+        });
+        _this.addTaskItemToList(_this.task_item, _this.todo);
+        _this.task_item.transforming();
         _this.rotate_x = -90;
-        return _this.task.controller.updateTransform(_this.rotate_x);
+        return _this.task_item.updateTransform(_this.rotate_x);
       });
       this.new_task.bind('touchmove', function(event) {
         var dy;
@@ -2139,26 +2152,30 @@
         _this.rotate_x = _this.rotate_x < 0 ? _this.rotate_x : 0;
         _this.translate_y = dy < 60 ? dy : 60;
         _this.translate_y = _this.translate_y > 0 ? _this.translate_y : 0;
-        _this.task.controller.updateTransform(_this.rotate_x);
+        _this.task_item.updateTransform(_this.rotate_x);
         _this.new_task.css({
-          '-webkit-transform': 'translateY(' + _this.translate_y + 'px)'
+          y: _this.translate_y
         });
         if (_this.rotate_x === 0) {
           if (!_this.create) {
             _this.task.name = "Release to create task";
-            _this.create = true;
-            return _this.task.save();
+            _this.task_item.render();
+            return _this.create = true;
           }
         } else {
           if (_this.create) {
             _this.task.name = "Pull to create task";
-            _this.create = false;
-            return _this.task.save();
+            _this.task_item.render();
+            return _this.create = false;
           }
         }
       });
       return this.new_task.bind('touchend', function(event) {
         if (_this.create) {
+          _this.task.save({
+            silent: true
+          });
+          console.log(_this.task_item.el);
           _this.after_todo.transition({
             y: _this.translate_y + 'px',
             complete: function() {
@@ -2168,19 +2185,19 @@
               _this.new_task.css({
                 y: 0
               });
-              _this.task.controller.transformed();
+              _this.task_item.transformed();
               return reset();
             }
           });
-          return _this.task.controller.startEditingName();
+          return _this.task_item.startEditingName();
         } else {
           _this.rotate_x = -90;
           _this.translate_y = 0;
           _this.new_task.transition({
             y: 0
           });
-          return _this.task.controller.updateTransform(-90, true, function() {
-            return _this.task.destroy();
+          return _this.task_item.updateTransform(-90, true, function() {
+            return reset();
           });
         }
       });
