@@ -162,7 +162,18 @@
         dx = dx > 0 ? dx : 0;
         dx = dx < 60 ? dx : 60;
         this.transformTranslateX(dx);
-        return this.transformCheckmarkOpacity(dx / 60);
+        this.transformCheckmarkOpacity(dx / 60);
+        if (dx === 60) {
+          if (!this.marked_done) {
+            this.content.addClass("green");
+            return this.marked_done = true;
+          }
+        } else {
+          if (this.marked_done) {
+            this.content.removeClass("green");
+            return this.marked_done = false;
+          }
+        }
       }
     };
 
