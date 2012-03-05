@@ -1,7 +1,8 @@
 #/bin/bash
 
 middleman build
-mv -f build/* ../checkpointtimer-deploy
+cp -r build/* ../checkpointtimer-deploy
+rm -rf build
 cd ../checkpointtimer-deploy
 git add -A
 git commit -m "Redeploy"
