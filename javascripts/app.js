@@ -2101,7 +2101,7 @@
       this.last_touch.x = event.originalEvent.touches[0].pageX;
       this.last_touch.y = event.originalEvent.touches[0].pageY;
       dx = this.last_touch.x - this.touch_start.x;
-      if (this.touching && !this.hovering) {
+      if (!this.hovering) {
         this.swiping = true;
         dx = dx > 0 ? dx : 0;
         dx = dx < 60 ? dx : 60;
@@ -2121,7 +2121,7 @@
       var dx, now;
       dx = this.last_touch.x - this.touch_start.x;
       now = new Date();
-      if ((!this.hovering) && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
+      if (this.touching && !this.hovering && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
         this.transformTranslateX(0);
         if (event.target === this.duration[0]) {
           this.toggleDuration();
