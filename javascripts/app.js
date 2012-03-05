@@ -2087,7 +2087,7 @@
       this.last_touch = {};
       this.hovering = false;
       this.swiping = false;
-      this.marked_done = false;
+      this.toggle_done = false;
       this.touch_start.x = event.originalEvent.touches[0].pageX;
       this.touch_start.y = event.originalEvent.touches[0].pageY;
       this.touch_start.time = new Date();
@@ -2097,7 +2097,7 @@
     };
 
     TaskItem.prototype.continueTouching = function(event) {
-      var dx;
+      var dx, updated_toggle_done;
       this.last_touch.x = event.originalEvent.touches[0].pageX;
       this.last_touch.y = event.originalEvent.touches[0].pageY;
       dx = this.last_touch.x - this.touch_start.x;
@@ -2108,18 +2108,28 @@
         dx = dx > 0 ? dx : 0;
         dx = dx < 60 ? dx : 60;
         this.transformTranslateX(dx);
-        this.transformCheckmarkOpacity(dx / 60);
-        if (dx === 60) {
-          if (!this.marked_done) {
-            this.content.addClass("green");
-            return this.marked_done = true;
-          }
+        if (this.item.done) {
+          this.transformCheckmarkOpacity(1 - (dx / 60));
         } else {
-          if (this.marked_done) {
-            this.content.removeClass("green");
-            return this.marked_done = false;
+          this.transformCheckmarkOpacity(dx / 60);
+        }
+        updated_toggle_done = dx === 60 ? true : false;
+        if (updated_toggle_done === !this.toggle_done) {
+          if (this.item.done) {
+            if (updated_toggle_done) {
+              this.content.removeClass("done");
+            } else {
+              this.content.addClass("done");
+            }
+          } else {
+            if (updated_toggle_done) {
+              this.content.addClass("green");
+            } else {
+              this.content.removeClass("green");
+            }
           }
         }
+        return this.toggle_done = updated_toggle_done;
       }
     };
 
@@ -2135,8 +2145,8 @@
           this.editName();
         }
       }
-      if (this.marked_done) {
-        this.item.done = true;
+      if (this.toggle_done) {
+        this.item.done = !this.item.done;
         return this.item.save();
       } else {
         this.transformTranslateX(0, true);
