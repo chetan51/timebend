@@ -2101,7 +2101,7 @@
       this.last_touch.x = event.originalEvent.touches[0].pageX;
       this.last_touch.y = event.originalEvent.touches[0].pageY;
       dx = this.last_touch.x - this.touch_start.x;
-      if (!this.hovering) {
+      if (this.touching && !this.hovering) {
         this.swiping = true;
         dx = dx > 0 ? dx : 0;
         dx = dx < 60 ? dx : 60;
