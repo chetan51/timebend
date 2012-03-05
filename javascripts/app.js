@@ -1974,7 +1974,7 @@
 
     function TaskItem() {
       this.toggleDuration = __bind(this.toggleDuration, this);
-      this.checkTouchHeld = __bind(this.checkTouchHeld, this);
+      this.checkTouchStatus = __bind(this.checkTouchStatus, this);
       this.finishTouching = __bind(this.finishTouching, this);
       this.continueTouching = __bind(this.continueTouching, this);
       this.startTouching = __bind(this.startTouching, this);
@@ -2082,16 +2082,18 @@
     };
 
     TaskItem.prototype.startTouching = function(event) {
-      this.touching = true;
-      this.hovering = false;
       this.touch_start = {};
       this.last_touch = {};
+      this.touching = true;
+      this.hovering = false;
+      this.swiping = false;
+      this.marked_done = false;
       this.touch_start.x = event.originalEvent.touches[0].pageX;
       this.touch_start.y = event.originalEvent.touches[0].pageY;
       this.touch_start.time = new Date();
       this.last_touch.x = this.touch_start.x;
       this.last_touch.y = this.touch_start.y;
-      return delay(350, this.checkTouchHeld);
+      return delay(350, this.checkTouchStatus);
     };
 
     TaskItem.prototype.continueTouching = function(event) {
@@ -2099,15 +2101,18 @@
       this.last_touch.x = event.originalEvent.touches[0].pageX;
       this.last_touch.y = event.originalEvent.touches[0].pageY;
       dx = this.last_touch.x - this.touch_start.x;
-      if (!this.hovering) {
+      if (this.touching && !this.hovering) {
+        this.swiping = true;
         dx = dx > 0 ? dx : 0;
         dx = dx < 60 ? dx : 60;
         this.transformTranslateX(dx);
         this.transformCheckmarkOpacity(dx / 60);
         if (dx === 60) {
-          return this.content.addClass("green");
+          this.content.addClass("green");
+          return this.marked_done = true;
         } else {
-          return this.content.removeClass("green");
+          this.content.removeClass("green");
+          return this.marked_done = false;
         }
       }
     };
@@ -2124,13 +2129,26 @@
           this.editName();
         }
       }
-      this.touching = false;
-      return this.hovering = false;
+      if (this.marked_done) {
+        this.item.done = true;
+        return this.item.save();
+      } else {
+        this.transformTranslateX(0, true);
+        this.touching = false;
+        return this.hovering = false;
+      }
     };
 
-    TaskItem.prototype.checkTouchHeld = function() {
-      var dx;
+    TaskItem.prototype.checkTouchStatus = function() {
+      var dx, dy;
       dx = this.last_touch.x - this.touch_start.x;
+      dy = this.last_touch.y - this.touch_start.y;
+      if (Math.abs(dy) > 60) {
+        this.touching = false;
+        this.marked_done = false;
+        this.transformTranslateX(0, true);
+        this.content.removeClass("green");
+      }
       if (this.touching && Math.abs(dx) <= this.config.touch_hold_dist_tolerance) {
         this.hovering = true;
         this.transformTranslateX(0);
