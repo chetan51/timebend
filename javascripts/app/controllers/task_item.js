@@ -160,7 +160,9 @@
       if (this.touching && !this.hovering) {
         this.swiping = true;
         dx = dx > 0 ? dx : 0;
-        return dx = dx < 60 ? dx : 60;
+        dx = dx < 60 ? dx : 60;
+        this.transformTranslateX(dx);
+        return this.transformCheckmarkOpacity(dx / 60);
       }
     };
 
