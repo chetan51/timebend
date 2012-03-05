@@ -69,80 +69,106 @@ a {
   width: 100%;
   top: 0;
   left: 0;
-  -webkit-transition: -webkit-transform .15s ease, opacity .15s ease;
   -webkit-perspective: 1000;
   -webkit-backface-visibility: hidden; }
 
-.task {
+#status, .task {
   height: 60px;
   -webkit-user-select: none;
-  -webkit-transition: all .1s ease;
-  -webkit-perspective: 0;
   -webkit-backface-visibility: hidden;
   position: relative;
   z-index: 1; }
-  .task .content {
-    background-color: #0086F3;
+  #status .content, .task .content {
     z-index: 1000;
     height: 58px;
     padding: 0 10px;
     font-size: 18px;
     font-weight: bold;
-    line-height: 58px;
     border-top: 1px solid rgba(255, 255, 255, 0.07);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    position: relative;
-    padding-right: 70px; }
-    .task .content.green {
-      background-color: #00AA33 !important; }
-    .task .content.done {
-      background-color: #111 !important;
-      color: #555; }
-      .task .content.done .name input[type="text"] {
-        color: #555;
-        text-decoration: line-through;
-        -webkit-transform: scaleX(1) !important; }
-  .task .behind {
+    position: relative; }
+  #status .behind, .task .behind {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 60px;
     z-index: -1000; }
-    .task .behind .check, .task .behind .cross {
+    #status .behind .check, #status .behind .cross, .task .behind .check, .task .behind .cross {
       display: block;
       width: 55px;
       height: 60px;
       position: absolute;
       top: 0; }
-    .task .behind .check {
+    #status .behind .check, .task .behind .check {
       left: 0; }
-    .task .behind .cross {
+    #status .behind .cross, .task .behind .cross {
       right: 0; }
-  .task .name {
-    display: inline-block;
+
+#status {
+  margin-bottom: 10px; }
+  #status .content {
+    background-color: #00AA33; }
+    #status .content #day-start, #status .content #day-end {
+      position: absolute;
+      top: 12px;
+      color: #000;
+      text-align: center; }
+      #status .content #day-start .time, #status .content #day-end .time {
+        font-size: 18px; }
+      #status .content #day-start .suffix, #status .content #day-end .suffix {
+        font-size: 12px;
+        text-transform: uppercase; }
+      #status .content #day-start .label, #status .content #day-end .label {
+        font-size: 11px; }
+    #status .content #day-start {
+      left: 10px; }
+    #status .content #day-end {
+      right: 10px; }
+    #status .content #reserve-left {
+      padding-left: 60px;
+      padding-right: 60px;
+      padding-top: 5px;
+      text-align: center; }
+      #status .content #reserve-left .time {
+        font-size: 30px; }
+      #status .content #reserve-left .label {
+        font-size: 12px; }
+
+.task .content {
+  background-color: #0086F3;
+  line-height: 58px; }
+  .task .content.green {
+    background-color: #00AA33 !important; }
+  .task .content.done {
+    background-color: #111 !important;
+    color: #555; }
+    .task .content.done .name input[type="text"] {
+      color: #555;
+      text-decoration: line-through; }
+.task .name {
+  position: relative;
+  padding-right: 70px; }
+  .task .name input[type="text"] {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
     position: relative;
-    width: 100%; }
-    .task .name input[type="text"] {
-      width: 100%;
-      border: none;
-      background: transparent;
-      color: #fff;
-      font-size: 18px;
-      font-weight: bold;
-      padding: 0;
-      margin: 0;
-      position: relative;
-      left: -1px; }
-  .task .duration {
-    position: absolute;
-    right: 0;
-    top: -1px;
-    width: 60px;
-    height: 60px;
-    text-align: center;
-    line-height: 60px;
-    background-color: rgba(255, 255, 255, 0.15); }
+    left: -1px; }
+.task .duration {
+  position: absolute;
+  right: 0;
+  top: -1px;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  background-color: rgba(255, 255, 255, 0.15); }
 
 #new-task, #clear-tasks {
   height: 60px;
@@ -151,12 +177,7 @@ a {
   background-image: -moz-linear-gradient(top, #222222, #111111);
   background-image: -o-linear-gradient(top, #222222, #111111);
   background-image: -ms-linear-gradient(top, #222222, #111111);
-  background-image: linear-gradient(top, #222222, #111111); }
-
-.buffer {
-  height: 60px; }
-
-#new-task, #clear-tasks {
+  background-image: linear-gradient(top, #222222, #111111);
   color: #777;
   font-size: 18px;
   font-weight: bold;

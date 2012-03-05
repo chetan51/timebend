@@ -8,6 +8,10 @@
 
     __extends(TaskItem, _super);
 
+    TaskItem.include(Touchable);
+
+    TaskItem.prototype.className = "task";
+
     TaskItem.prototype.elements = {
       ".content": "content",
       "input[type='text']": "name_input",
@@ -16,10 +20,7 @@
     };
 
     TaskItem.prototype.events = {
-      "focusout input[type='text']": "updateName",
-      "touchstart": "startTouching",
-      "touchmove": "continueTouching",
-      "touchend": "finishTouching"
+      "focusout input[type='text']": "updateName"
     };
 
     TaskItem.prototype.config = {
@@ -50,6 +51,7 @@
       if (!this.item) throw "@item required";
       this.item.bind("update", this.render);
       this.item.bind("destroy", this.remove);
+      this.watchTouch();
     }
 
     TaskItem.prototype.template = function(item) {
@@ -107,7 +109,7 @@
     };
 
     TaskItem.prototype.transformTranslateX = function(dist, animated, callback) {
-      return this.transform(this.content, 'x', dist, 'px', animated, callback);
+      return this.transform(this.content, 'x', dist, '', animated, callback);
     };
 
     TaskItem.prototype.transformCheckmarkOpacity = function(dist, animated, callback) {
@@ -139,24 +141,16 @@
     };
 
     TaskItem.prototype.startTouching = function(event) {
-      this.touch_start = {};
-      this.last_touch = {};
+      this.touching = true;
       this.hovering = false;
       this.swiping = false;
       this.toggle_done = false;
-      this.touch_start.x = event.originalEvent.touches[0].pageX;
-      this.touch_start.y = event.originalEvent.touches[0].pageY;
-      this.touch_start.time = new Date();
-      this.last_touch.x = this.touch_start.x;
-      this.last_touch.y = this.touch_start.y;
       return delay(350, this.checkTouchStatus);
     };
 
     TaskItem.prototype.continueTouching = function(event) {
       var dx, updated_toggle_done;
-      this.last_touch.x = event.originalEvent.touches[0].pageX;
-      this.last_touch.y = event.originalEvent.touches[0].pageY;
-      dx = this.last_touch.x - this.touch_start.x;
+      dx = this.touch_last.x - this.touch_start.x;
       if (!this.hovering && !app.global_scrolling && Math.abs(dx) > this.config.touch_swipe_dist_tolerance) {
         this.swiping = true;
       }
@@ -191,7 +185,8 @@
 
     TaskItem.prototype.finishTouching = function(event) {
       var dx, now;
-      dx = this.last_touch.x - this.touch_start.x;
+      dx = this.touch_last.x - this.touch_start.x;
+      this.touching = false;
       now = new Date();
       if (!this.hovering && !app.global_scrolling && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
         this.transformTranslateX(0);
@@ -212,9 +207,9 @@
 
     TaskItem.prototype.checkTouchStatus = function() {
       var dx, dy;
-      dx = this.last_touch.x - this.touch_start.x;
-      dy = this.last_touch.y - this.touch_start.y;
-      if (!app.global_scrolling && Math.abs(dx) <= this.config.touch_hold_dist_tolerance) {
+      dx = this.touch_last.x - this.touch_start.x;
+      dy = this.touch_last.y - this.touch_start.y;
+      if (this.touching && !app.global_scrolling && Math.abs(dx) <= this.config.touch_hold_dist_tolerance) {
         this.hovering = true;
         this.transformTranslateX(0);
         return console.log("hovering task");
