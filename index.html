@@ -52,8 +52,6 @@
 	</head>
 <body class="index">
   
-<img id="check" src="images/check.png"/>
-<img id="cross" src="images/cross.png"/>
 <div id="wrapper" data-role="page">
   <div id="tasks">
     <div id="todo"></div>
@@ -69,11 +67,15 @@
 
 <div id="templates">
   <div id="task-template">
-  <div class="task{{ if(task.done) print(' done'); }}">
-    <div class="inner">
+  <div class="task">
+    <div class="content {{ if(task.done) print(' done'); }}">
       <div class="name"><input type="text" value="{{= task.name }}"></div>
       <div class="duration">{{= task.duration }}</div>
     </div>
+    <div class="behind">
+      <img class="check" src="images/check.png"/>
+      <img class="cross" src="images/cross.png"/>
+    </div>      
   </div>
 </div>
 

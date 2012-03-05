@@ -62,24 +62,8 @@ a {
   overflow-x: hidden;
   overflow-y: scroll; }
 
-#check, #cross {
-  display: block;
-  width: 55px;
-  height: 60px;
-  position: absolute;
-  -webkit-transition: opacity 0 cubic-bezier(0, 0, 0.2, 1), -webkit-transform 0 cubic-bezier(0, 0, 0.2, 1);
-  -webkit-perspective: 0;
-  -webkit-backface-visibility: hidden;
-  display: none; }
-
 #templates {
   display: none; }
-
-#check {
-  left: 0; }
-
-#cross {
-  right: 0; }
 
 #todo, #done {
   width: 100%;
@@ -97,7 +81,9 @@ a {
   -webkit-backface-visibility: hidden;
   position: relative;
   z-index: 1; }
-  .task .inner {
+  .task .content {
+    background-color: #0086F3;
+    z-index: 1000;
     height: 58px;
     padding: 0 10px;
     font-size: 18px;
@@ -107,36 +93,56 @@ a {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     position: relative;
     padding-right: 70px; }
+    .task .content.green {
+      background-color: #00AA33 !important; }
+    .task .content.done {
+      background-color: #111 !important;
+      color: #555; }
+      .task .content.done .name input[type="text"] {
+        color: #555;
+        text-decoration: line-through;
+        -webkit-transform: scaleX(1) !important; }
+  .task .behind {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    z-index: -1000; }
+    .task .behind .check, .task .behind .cross {
+      display: block;
+      width: 55px;
+      height: 60px;
+      position: absolute;
+      top: 0; }
+    .task .behind .check {
+      left: 0; }
+    .task .behind .cross {
+      right: 0; }
   .task .name {
     display: inline-block;
     position: relative;
     width: 100%; }
-    .task .name span {
-      position: absolute;
-      z-index: 2;
-      display: block;
+    .task .name input[type="text"] {
       width: 100%;
-      height: 2px;
-      background-color: #fff;
-      left: 0;
-      top: 52%;
-      -webkit-user-select: none;
-      -webkit-perspective: 0;
-      -webkit-backface-visibility: hidden;
-      -webkit-transform-origin: 0%;
-      -webkit-transition: -webkit-transform 0 cubic-bezier(0, 0, 0.2, 1);
-      -webkit-transform: scaleX(0); }
-  .task input[type="text"] {
-    width: 100%;
-    border: none;
-    background: transparent;
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 0;
-    margin: 0;
-    position: relative;
-    left: -1px; }
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 0;
+      margin: 0;
+      position: relative;
+      left: -1px; }
+  .task .duration {
+    position: absolute;
+    right: 0;
+    top: -1px;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    background-color: rgba(255, 255, 255, 0.15); }
 
 #new-task, #clear-tasks {
   height: 60px;
@@ -149,27 +155,6 @@ a {
 
 .buffer {
   height: 60px; }
-
-.task {
-  background-color: #0086F3; }
-  .task .duration {
-    position: absolute;
-    right: 0;
-    top: -1px;
-    width: 60px;
-    height: 60px;
-    text-align: center;
-    line-height: 60px;
-    background-color: rgba(255, 255, 255, 0.15); }
-  .task.green {
-    background-color: #00AA33 !important; }
-  .task.done {
-    background-color: #111 !important;
-    color: #555; }
-    .task.done .name input[type="text"] {
-      color: #555;
-      text-decoration: line-through;
-      -webkit-transform: scaleX(1) !important; }
 
 #new-task, #clear-tasks {
   color: #777;

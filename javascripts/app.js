@@ -1952,25 +1952,40 @@
 
     __extends(TaskItem, _super);
 
+    TaskItem.prototype.elements = {
+      ".content": "content",
+      "input[type='text']": "name_input",
+      ".duration": "duration",
+      ".check": "checkmark"
+    };
+
     TaskItem.prototype.events = {
-      "tap input[type='text']": "editName",
       "focusout input[type='text']": "updateName",
-      "tap .duration": "toggleDuration",
       "touchstart": "startTouching",
       "touchmove": "continueTouching",
       "touchend": "finishTouching"
     };
 
+    TaskItem.prototype.config = {
+      touch_tap_time_tolerance: 500,
+      touch_tap_dist_tolerance: 5,
+      touch_hold_dist_tolerance: 5
+    };
+
     function TaskItem() {
       this.toggleDuration = __bind(this.toggleDuration, this);
+      this.checkTouchHeld = __bind(this.checkTouchHeld, this);
       this.finishTouching = __bind(this.finishTouching, this);
       this.continueTouching = __bind(this.continueTouching, this);
       this.startTouching = __bind(this.startTouching, this);
       this.remove = __bind(this.remove, this);
       this.updateName = __bind(this.updateName, this);
-      this.editName = __bind(this.editName, this);
       this.startEditingName = __bind(this.startEditingName, this);
-      this.updateTransform = __bind(this.updateTransform, this);
+      this.editName = __bind(this.editName, this);
+      this.transformCheckmarkOpacity = __bind(this.transformCheckmarkOpacity, this);
+      this.transformTranslateX = __bind(this.transformTranslateX, this);
+      this.transformRotateX = __bind(this.transformRotateX, this);
+      this.transform = __bind(this.transform, this);
       this.transformed = __bind(this.transformed, this);
       this.transforming = __bind(this.transforming, this);
       this.render = __bind(this.render, this);
@@ -2007,42 +2022,53 @@
       });
     };
 
-    TaskItem.prototype.updateTransform = function(rotate_x, animated, callback) {
+    TaskItem.prototype.transform = function(element, name, dist, unit, animated, callback) {
       var transform_properties,
         _this = this;
-      this.el.css({
-        transformOrigin: '50% 0'
-      });
-      transform_properties = {
-        rotateX: rotate_x + 'deg'
-      };
+      transform_properties = {};
+      transform_properties[name] = dist + unit;
       if (animated) {
-        if (this.el.css('rotateX') === rotate_x + 'deg') {
+        if (element.css(name) === dist + unit) {
           return callback && callback();
         } else {
-          return this.el.transition(_.extend(transform_properties, {
+          return element.transition(_.extend(transform_properties, {
             complete: function() {
               return callback && callback();
             }
           }));
         }
       } else {
-        return this.el.css(transform_properties);
+        return element.css(transform_properties);
       }
+    };
+
+    TaskItem.prototype.transformRotateX = function(dist, animated, callback) {
+      this.el.css({
+        transformOrigin: '50% 0'
+      });
+      return this.transform(this.el, 'rotateX', dist, 'deg', animated, callback);
+    };
+
+    TaskItem.prototype.transformTranslateX = function(dist, animated, callback) {
+      return this.transform(this.content, 'x', dist, 'px', animated, callback);
+    };
+
+    TaskItem.prototype.transformCheckmarkOpacity = function(dist, animated, callback) {
+      return this.transform(this.checkmark, 'opacity', dist, '', animated, callback);
+    };
+
+    TaskItem.prototype.editName = function() {
+      return this.el.find('input').focus();
     };
 
     TaskItem.prototype.startEditingName = function() {
       this.el.find('input').val("");
-      return this.el.find('input').focus();
+      return this.editName();
     };
 
-    TaskItem.prototype.editName = function(event) {
-      return event.target.focus();
-    };
-
-    TaskItem.prototype.updateName = function(event) {
+    TaskItem.prototype.updateName = function() {
       var name;
-      name = $(event.target).val();
+      name = this.name_input.val();
       if (name.length) {
         this.item.name = name;
         return this.item.save();
@@ -2056,20 +2082,64 @@
     };
 
     TaskItem.prototype.startTouching = function(event) {
-      return console.log(event);
+      this.touching = true;
+      this.hovering = false;
+      this.touch_start = {};
+      this.last_touch = {};
+      this.touch_start.x = event.originalEvent.touches[0].pageX;
+      this.touch_start.y = event.originalEvent.touches[0].pageY;
+      this.touch_start.time = new Date();
+      this.last_touch.x = this.touch_start.x;
+      this.last_touch.y = this.touch_start.y;
+      return delay(350, this.checkTouchHeld);
     };
 
     TaskItem.prototype.continueTouching = function(event) {
-      return console.log(event);
+      var dx;
+      this.last_touch.x = event.originalEvent.touches[0].pageX;
+      this.last_touch.y = event.originalEvent.touches[0].pageY;
+      dx = this.last_touch.x - this.touch_start.x;
+      if (!this.hovering) {
+        dx = dx > 0 ? dx : 0;
+        dx = dx < 60 ? dx : 60;
+        this.transformTranslateX(dx);
+        this.transformCheckmarkOpacity(dx / 60);
+        if (dx === 60) {
+          return this.content.addClass("green");
+        } else {
+          return this.content.removeClass("green");
+        }
+      }
     };
 
     TaskItem.prototype.finishTouching = function(event) {
-      return console.log(event);
+      var dx, now;
+      dx = this.last_touch.x - this.touch_start.x;
+      now = new Date();
+      if ((!this.hovering) && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
+        this.transformTranslateX(0);
+        if (event.target === this.duration[0]) {
+          this.toggleDuration();
+        } else {
+          this.editName();
+        }
+      }
+      this.touching = false;
+      return this.hovering = false;
+    };
+
+    TaskItem.prototype.checkTouchHeld = function() {
+      var dx;
+      dx = this.last_touch.x - this.touch_start.x;
+      if (this.touching && Math.abs(dx) <= this.config.touch_hold_dist_tolerance) {
+        this.hovering = true;
+        this.transformTranslateX(0);
+        return console.log("hovering task");
+      }
     };
 
     TaskItem.prototype.toggleDuration = function() {
-      console.log("Duration");
-      return alert("duration tapped");
+      return console.log("toggling duration");
     };
 
     return TaskItem;
@@ -2164,7 +2234,7 @@
       this.addTaskItemToList(this.task_item, this.todo);
       this.task_item.transforming();
       this.rotate_x = -90;
-      return this.task_item.updateTransform(this.rotate_x);
+      return this.task_item.transformRotateX(this.rotate_x);
     };
 
     Tasks.prototype.continueTouchingNewTask = function(event) {
@@ -2175,7 +2245,7 @@
       this.rotate_x = this.rotate_x < 0 ? this.rotate_x : 0;
       this.translate_y = dy < 60 ? dy : 60;
       this.translate_y = this.translate_y > 0 ? this.translate_y : 0;
-      this.task_item.updateTransform(this.rotate_x);
+      this.task_item.transformRotateX(this.rotate_x);
       this.new_task.css({
         y: this.translate_y
       });
@@ -2220,7 +2290,8 @@
         this.new_task.transition({
           y: 0
         });
-        return this.task_item.updateTransform(-90, true, function() {
+        return this.task_item.transformRotateX(-90, true, function() {
+          _this.task_item.remove();
           return _this.resetTouchingNewTask();
         });
       }
@@ -2243,7 +2314,7 @@
       this.new_task.transition({
         y: -60
       });
-      return task.controller.updateTransform(-90, true, function() {
+      return task.controller.transformRotateX(-90, true, function() {
         _this.after_todo.css({
           y: 0
         });

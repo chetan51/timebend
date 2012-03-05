@@ -83,7 +83,7 @@
       this.addTaskItemToList(this.task_item, this.todo);
       this.task_item.transforming();
       this.rotate_x = -90;
-      return this.task_item.updateTransform(this.rotate_x);
+      return this.task_item.transformRotateX(this.rotate_x);
     };
 
     Tasks.prototype.continueTouchingNewTask = function(event) {
@@ -94,7 +94,7 @@
       this.rotate_x = this.rotate_x < 0 ? this.rotate_x : 0;
       this.translate_y = dy < 60 ? dy : 60;
       this.translate_y = this.translate_y > 0 ? this.translate_y : 0;
-      this.task_item.updateTransform(this.rotate_x);
+      this.task_item.transformRotateX(this.rotate_x);
       this.new_task.css({
         y: this.translate_y
       });
@@ -139,7 +139,8 @@
         this.new_task.transition({
           y: 0
         });
-        return this.task_item.updateTransform(-90, true, function() {
+        return this.task_item.transformRotateX(-90, true, function() {
+          _this.task_item.remove();
           return _this.resetTouchingNewTask();
         });
       }
@@ -162,7 +163,7 @@
       this.new_task.transition({
         y: -60
       });
-      return task.controller.updateTransform(-90, true, function() {
+      return task.controller.transformRotateX(-90, true, function() {
         _this.after_todo.css({
           y: 0
         });
