@@ -10,10 +10,18 @@
 
     TaskItem.prototype.events = {
       "tap input[type='text']": "editName",
-      "focusout input[type='text']": "updateName"
+      "focusout input[type='text']": "updateName",
+      "tap .duration": "toggleDuration",
+      "touchstart": "startTouching",
+      "touchmove": "continueTouching",
+      "touchend": "finishTouching"
     };
 
     function TaskItem() {
+      this.toggleDuration = __bind(this.toggleDuration, this);
+      this.finishTouching = __bind(this.finishTouching, this);
+      this.continueTouching = __bind(this.continueTouching, this);
+      this.startTouching = __bind(this.startTouching, this);
       this.remove = __bind(this.remove, this);
       this.updateName = __bind(this.updateName, this);
       this.editName = __bind(this.editName, this);
@@ -101,6 +109,23 @@
 
     TaskItem.prototype.remove = function() {
       return this.el.remove();
+    };
+
+    TaskItem.prototype.startTouching = function(event) {
+      return console.log(event);
+    };
+
+    TaskItem.prototype.continueTouching = function(event) {
+      return console.log(event);
+    };
+
+    TaskItem.prototype.finishTouching = function(event) {
+      return console.log(event);
+    };
+
+    TaskItem.prototype.toggleDuration = function() {
+      console.log("Duration");
+      return alert("duration tapped");
     };
 
     return TaskItem;

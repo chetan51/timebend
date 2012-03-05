@@ -287,6 +287,8 @@ var phantom = function(GLOBAL) {
 
 		e.preventDefault();
 		e.stopPropagation();
+		
+		fireTouchEvents('tap', e);
 	}
 
 	// Not entirely proud of this, but I can't serve CSS from GitHub

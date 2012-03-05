@@ -1954,10 +1954,18 @@
 
     TaskItem.prototype.events = {
       "tap input[type='text']": "editName",
-      "focusout input[type='text']": "updateName"
+      "focusout input[type='text']": "updateName",
+      "tap .duration": "toggleDuration",
+      "touchstart": "startTouching",
+      "touchmove": "continueTouching",
+      "touchend": "finishTouching"
     };
 
     function TaskItem() {
+      this.toggleDuration = __bind(this.toggleDuration, this);
+      this.finishTouching = __bind(this.finishTouching, this);
+      this.continueTouching = __bind(this.continueTouching, this);
+      this.startTouching = __bind(this.startTouching, this);
       this.remove = __bind(this.remove, this);
       this.updateName = __bind(this.updateName, this);
       this.editName = __bind(this.editName, this);
@@ -2047,6 +2055,23 @@
       return this.el.remove();
     };
 
+    TaskItem.prototype.startTouching = function(event) {
+      return console.log(event);
+    };
+
+    TaskItem.prototype.continueTouching = function(event) {
+      return console.log(event);
+    };
+
+    TaskItem.prototype.finishTouching = function(event) {
+      return console.log(event);
+    };
+
+    TaskItem.prototype.toggleDuration = function() {
+      console.log("Duration");
+      return alert("duration tapped");
+    };
+
     return TaskItem;
 
   })(Spine.Controller);
@@ -2074,9 +2099,18 @@
       "#after-todo": "after_todo"
     };
 
+    Tasks.prototype.events = {
+      "touchstart #new-task": "startTouchingNewTask",
+      "touchmove #new-task": "continueTouchingNewTask",
+      "touchend #new-task": "finishTouchingNewTask"
+    };
+
     function Tasks() {
       this["delete"] = __bind(this["delete"], this);
-      this.watchForNewTaskGesture = __bind(this.watchForNewTaskGesture, this);
+      this.resetTouchingNewTask = __bind(this.resetTouchingNewTask, this);
+      this.finishTouchingNewTask = __bind(this.finishTouchingNewTask, this);
+      this.continueTouchingNewTask = __bind(this.continueTouchingNewTask, this);
+      this.startTouchingNewTask = __bind(this.startTouchingNewTask, this);
       this.addAll = __bind(this.addAll, this);
       this.addTaskItemToList = __bind(this.addTaskItemToList, this);
       this.addOne = __bind(this.addOne, this);
@@ -2084,7 +2118,6 @@
       Task.bind("refresh", this.render);
       Task.bind("create", this.addOne);
       Tasks.bind("task:delete", this["delete"]);
-      this.watchForNewTaskGesture();
     }
 
     Tasks.prototype.render = function() {
@@ -2117,89 +2150,89 @@
       return Task.each(this.addOne);
     };
 
-    Tasks.prototype.watchForNewTaskGesture = function() {
-      var reset,
-        _this = this;
-      reset = function() {
-        _this.touch_start = {};
-        _this.task = null;
-        _this.task_item = null;
-        _this.rotate_x = 0;
-        _this.translate_y = 0;
-        return _this.create = false;
-      };
-      reset();
-      this.new_task.bind('touchstart', function(event) {
-        _this.touch_start.x = event.originalEvent.touches[0].pageX;
-        _this.touch_start.y = event.originalEvent.touches[0].pageY;
-        _this.task = Task.init({
-          duration: 1,
-          name: "Pull to create task"
-        });
-        _this.task_item = new TaskItem({
-          item: _this.task
-        });
-        _this.addTaskItemToList(_this.task_item, _this.todo);
-        _this.task_item.transforming();
-        _this.rotate_x = -90;
-        return _this.task_item.updateTransform(_this.rotate_x);
+    Tasks.prototype.startTouchingNewTask = function(event) {
+      this.resetTouchingNewTask();
+      this.touch_start.x = event.originalEvent.touches[0].pageX;
+      this.touch_start.y = event.originalEvent.touches[0].pageY;
+      this.task = Task.init({
+        duration: 1,
+        name: "Pull to create task"
       });
-      this.new_task.bind('touchmove', function(event) {
-        var dy;
-        event.preventDefault();
-        dy = event.originalEvent.touches[0].pageY - _this.touch_start.y;
-        _this.rotate_x = dy > 0 ? -90 + dy : -90;
-        _this.rotate_x = _this.rotate_x < 0 ? _this.rotate_x : 0;
-        _this.translate_y = dy < 60 ? dy : 60;
-        _this.translate_y = _this.translate_y > 0 ? _this.translate_y : 0;
-        _this.task_item.updateTransform(_this.rotate_x);
-        _this.new_task.css({
-          y: _this.translate_y
-        });
-        if (_this.rotate_x === 0) {
-          if (!_this.create) {
-            _this.task.name = "Release to create task";
-            _this.task_item.render();
-            return _this.create = true;
-          }
-        } else {
-          if (_this.create) {
-            _this.task.name = "Pull to create task";
-            _this.task_item.render();
-            return _this.create = false;
-          }
+      this.task_item = new TaskItem({
+        item: this.task
+      });
+      this.addTaskItemToList(this.task_item, this.todo);
+      this.task_item.transforming();
+      this.rotate_x = -90;
+      return this.task_item.updateTransform(this.rotate_x);
+    };
+
+    Tasks.prototype.continueTouchingNewTask = function(event) {
+      var dy;
+      event.preventDefault();
+      dy = event.originalEvent.touches[0].pageY - this.touch_start.y;
+      this.rotate_x = dy > 0 ? -90 + dy : -90;
+      this.rotate_x = this.rotate_x < 0 ? this.rotate_x : 0;
+      this.translate_y = dy < 60 ? dy : 60;
+      this.translate_y = this.translate_y > 0 ? this.translate_y : 0;
+      this.task_item.updateTransform(this.rotate_x);
+      this.new_task.css({
+        y: this.translate_y
+      });
+      if (this.rotate_x === 0) {
+        if (!this.create) {
+          this.task.name = "Release to create task";
+          this.task_item.render();
+          return this.create = true;
         }
-      });
-      return this.new_task.bind('touchend', function(event) {
-        if (_this.create) {
-          _this.task.save({
-            silent: true
-          });
-          _this.after_todo.transition({
-            y: _this.translate_y + 'px',
-            complete: function() {
-              _this.after_todo.css({
-                y: 0
-              });
-              _this.new_task.css({
-                y: 0
-              });
-              _this.task_item.transformed();
-              return reset();
-            }
-          });
-          return _this.task_item.startEditingName();
-        } else {
-          _this.rotate_x = -90;
-          _this.translate_y = 0;
-          _this.new_task.transition({
-            y: 0
-          });
-          return _this.task_item.updateTransform(-90, true, function() {
-            return reset();
-          });
+      } else {
+        if (this.create) {
+          this.task.name = "Pull to create task";
+          this.task_item.render();
+          return this.create = false;
         }
-      });
+      }
+    };
+
+    Tasks.prototype.finishTouchingNewTask = function(event) {
+      var _this = this;
+      if (this.create) {
+        this.task.save({
+          silent: true
+        });
+        this.after_todo.transition({
+          y: this.translate_y + 'px',
+          complete: function() {
+            _this.after_todo.css({
+              y: 0
+            });
+            _this.new_task.css({
+              y: 0
+            });
+            _this.task_item.transformed();
+            return _this.resetTouchingNewTask();
+          }
+        });
+        return this.task_item.startEditingName();
+      } else {
+        this.rotate_x = -90;
+        this.translate_y = 0;
+        this.new_task.transition({
+          y: 0
+        });
+        return this.task_item.updateTransform(-90, true, function() {
+          return _this.resetTouchingNewTask();
+        });
+      }
+    };
+
+    Tasks.prototype.resetTouchingNewTask = function() {
+      this.touch_start = {};
+      this.task = null;
+      this.task_item = null;
+      this.rotate_x = 0;
+      this.translate_y = 0;
+      return this.create = false;
     };
 
     Tasks.prototype["delete"] = function(task) {
