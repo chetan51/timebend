@@ -8,6 +8,10 @@
 }).call(this);
 (function() {
 
+  window.delay = function(ms, func) {
+    return setTimeout(func, ms);
+  };
+
   window.truncate = function(value) {
     if (value < 0) {
       return Math.ceil(value);
@@ -1964,7 +1968,6 @@
       if (!this.item) throw "@item required";
       this.item.bind("update", this.render);
       this.item.bind("destroy", this.remove);
-      this.item.controller = this;
     }
 
     TaskItem.prototype.template = function(item) {
@@ -1975,6 +1978,7 @@
 
     TaskItem.prototype.render = function(item) {
       if (item) this.item = item;
+      this.item.controller = this;
       this.html(this.template(this.item));
       return this;
     };
@@ -1996,19 +2000,21 @@
     TaskItem.prototype.updateTransform = function(rotate_x, animated, callback) {
       var transform_properties,
         _this = this;
+      this.el.css({
+        '-webkit-transform-origin': '50% top 0'
+      });
       transform_properties = {
-        '-webkit-transform-origin': '50% top 0',
-        '-webkit-transform': 'rotateX(' + rotate_x + 'deg)'
+        rotateX: rotate_x + 'deg'
       };
       if (animated) {
         if (this.el.css('-webkit-transform') === 'rotateX(' + rotate_x + 'deg)') {
           return callback && callback();
         } else {
-          return this.el.animate(transform_properties, {
+          return this.el.transition(_.extend(transform_properties, {
             complete: function() {
               return callback && callback();
             }
-          });
+          }));
         }
       } else {
         return this.el.css(transform_properties);
@@ -2031,7 +2037,7 @@
         this.item.name = name;
         return this.item.save();
       } else {
-        return this.item.destroy();
+        return Tasks.trigger('task:delete', this.item);
       }
     };
 
@@ -2056,6 +2062,8 @@
 
     __extends(Tasks, _super);
 
+    Tasks.extend(Spine.Events);
+
     Tasks.prototype.elements = {
       "#todo": "todo",
       "#done": "done",
@@ -2065,12 +2073,14 @@
     };
 
     function Tasks() {
+      this["delete"] = __bind(this["delete"], this);
       this.watchForNewTaskGesture = __bind(this.watchForNewTaskGesture, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);      Tasks.__super__.constructor.apply(this, arguments);
       Task.bind("refresh", this.render);
       Task.bind("create", this.addOne);
+      Tasks.bind("task:delete", this["delete"]);
       this.watchForNewTaskGesture();
     }
 
@@ -2111,8 +2121,8 @@
       };
       reset();
       this.new_task.bind('touchstart', function(event) {
-        _this.touch_start.x = event.touches[0].pageX;
-        _this.touch_start.y = event.touches[0].pageY;
+        _this.touch_start.x = event.originalEvent.touches[0].pageX;
+        _this.touch_start.y = event.originalEvent.touches[0].pageY;
         _this.task = Task.create({
           duration: 1,
           name: "Pull to create task"
@@ -2124,7 +2134,7 @@
       this.new_task.bind('touchmove', function(event) {
         var dy;
         event.preventDefault();
-        dy = event.touches[0].pageY - _this.touch_start.y;
+        dy = event.originalEvent.touches[0].pageY - _this.touch_start.y;
         _this.rotate_x = dy > 0 ? -90 + dy : -90;
         _this.rotate_x = _this.rotate_x < 0 ? _this.rotate_x : 0;
         _this.translate_y = dy < 60 ? dy : 60;
@@ -2149,15 +2159,14 @@
       });
       return this.new_task.bind('touchend', function(event) {
         if (_this.create) {
-          _this.after_todo.animate({
-            '-webkit-transform': 'translateY(' + _this.translate_y + 'px)'
-          }, {
+          _this.after_todo.transition({
+            y: _this.translate_y + 'px',
             complete: function() {
               _this.after_todo.css({
-                '-webkit-transform': 'translateY(0)'
+                y: 0
               });
               _this.new_task.css({
-                '-webkit-transform': 'translateY(0)'
+                y: 0
               });
               _this.task.controller.transformed();
               return reset();
@@ -2167,17 +2176,32 @@
         } else {
           _this.rotate_x = -90;
           _this.translate_y = 0;
-          _this.after_todo.animate({
-            '-webkit-transform': 'translateY(0)'
+          _this.new_task.transition({
+            y: 0
           });
-          _this.new_task.animate({
-            '-webkit-transform': 'translateY(0)'
-          });
-          return _this.task.controller.updateTransform(_this.rotate_x, true, function() {
-            _this.task.destroy();
-            return reset();
+          return _this.task.controller.updateTransform(-90, true, function() {
+            return _this.task.destroy();
           });
         }
+      });
+    };
+
+    Tasks.prototype["delete"] = function(task) {
+      var _this = this;
+      this.after_todo.transition({
+        y: -60
+      });
+      this.new_task.transition({
+        y: -60
+      });
+      return task.controller.updateTransform(-90, true, function() {
+        _this.after_todo.css({
+          y: 0
+        });
+        _this.new_task.css({
+          y: 0
+        });
+        return task.destroy();
       });
     };
 

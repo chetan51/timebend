@@ -26,7 +26,6 @@
       if (!this.item) throw "@item required";
       this.item.bind("update", this.render);
       this.item.bind("destroy", this.remove);
-      this.item.controller = this;
     }
 
     TaskItem.prototype.template = function(item) {
@@ -37,6 +36,7 @@
 
     TaskItem.prototype.render = function(item) {
       if (item) this.item = item;
+      this.item.controller = this;
       this.html(this.template(this.item));
       return this;
     };
@@ -58,19 +58,21 @@
     TaskItem.prototype.updateTransform = function(rotate_x, animated, callback) {
       var transform_properties,
         _this = this;
+      this.el.css({
+        '-webkit-transform-origin': '50% top 0'
+      });
       transform_properties = {
-        '-webkit-transform-origin': '50% top 0',
-        '-webkit-transform': 'rotateX(' + rotate_x + 'deg)'
+        rotateX: rotate_x + 'deg'
       };
       if (animated) {
         if (this.el.css('-webkit-transform') === 'rotateX(' + rotate_x + 'deg)') {
           return callback && callback();
         } else {
-          return this.el.animate(transform_properties, {
+          return this.el.transition(_.extend(transform_properties, {
             complete: function() {
               return callback && callback();
             }
-          });
+          }));
         }
       } else {
         return this.el.css(transform_properties);
@@ -93,7 +95,7 @@
         this.item.name = name;
         return this.item.save();
       } else {
-        return this.item.destroy();
+        return Tasks.trigger('task:delete', this.item);
       }
     };
 

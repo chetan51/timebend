@@ -1,5 +1,9 @@
 (function() {
 
+  window.delay = function(ms, func) {
+    return setTimeout(func, ms);
+  };
+
   window.truncate = function(value) {
     if (value < 0) {
       return Math.ceil(value);
