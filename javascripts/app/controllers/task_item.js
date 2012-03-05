@@ -25,7 +25,8 @@
     TaskItem.prototype.config = {
       touch_tap_time_tolerance: 500,
       touch_tap_dist_tolerance: 5,
-      touch_hold_dist_tolerance: 5
+      touch_hold_dist_tolerance: 5,
+      touch_swipe_dist_tolerance: 15
     };
 
     function TaskItem() {
@@ -140,7 +141,6 @@
     TaskItem.prototype.startTouching = function(event) {
       this.touch_start = {};
       this.last_touch = {};
-      this.touching = true;
       this.hovering = false;
       this.swiping = false;
       this.marked_done = false;
@@ -157,8 +157,10 @@
       this.last_touch.x = event.originalEvent.touches[0].pageX;
       this.last_touch.y = event.originalEvent.touches[0].pageY;
       dx = this.last_touch.x - this.touch_start.x;
-      if (this.touching && !this.hovering) {
+      if (!this.hovering && !app.global_scrolling && Math.abs(dx) > this.config.touch_swipe_dist_tolerance) {
         this.swiping = true;
+      }
+      if (this.swiping) {
         dx = dx > 0 ? dx : 0;
         dx = dx < 60 ? dx : 60;
         this.transformTranslateX(dx);
@@ -181,7 +183,7 @@
       var dx, now;
       dx = this.last_touch.x - this.touch_start.x;
       now = new Date();
-      if (this.touching && !this.hovering && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
+      if (!this.hovering && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
         this.transformTranslateX(0);
         if (event.target === this.duration[0]) {
           this.toggleDuration();
@@ -194,7 +196,6 @@
         return this.item.save();
       } else {
         this.transformTranslateX(0, true);
-        this.touching = false;
         return this.hovering = false;
       }
     };
@@ -203,13 +204,7 @@
       var dx, dy;
       dx = this.last_touch.x - this.touch_start.x;
       dy = this.last_touch.y - this.touch_start.y;
-      if (Math.abs(dy) > 60) {
-        this.touching = false;
-        this.marked_done = false;
-        this.transformTranslateX(0, true);
-        this.content.removeClass("green");
-      }
-      if (this.touching && Math.abs(dx) <= this.config.touch_hold_dist_tolerance) {
+      if (!app.global_scrolling && Math.abs(dx) <= this.config.touch_hold_dist_tolerance) {
         this.hovering = true;
         this.transformTranslateX(0);
         return console.log("hovering task");

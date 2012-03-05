@@ -1969,7 +1969,8 @@
     TaskItem.prototype.config = {
       touch_tap_time_tolerance: 500,
       touch_tap_dist_tolerance: 5,
-      touch_hold_dist_tolerance: 5
+      touch_hold_dist_tolerance: 5,
+      touch_swipe_dist_tolerance: 15
     };
 
     function TaskItem() {
@@ -2084,7 +2085,6 @@
     TaskItem.prototype.startTouching = function(event) {
       this.touch_start = {};
       this.last_touch = {};
-      this.touching = true;
       this.hovering = false;
       this.swiping = false;
       this.marked_done = false;
@@ -2101,8 +2101,10 @@
       this.last_touch.x = event.originalEvent.touches[0].pageX;
       this.last_touch.y = event.originalEvent.touches[0].pageY;
       dx = this.last_touch.x - this.touch_start.x;
-      if (this.touching && !this.hovering) {
+      if (!this.hovering && !app.global_scrolling && Math.abs(dx) > this.config.touch_swipe_dist_tolerance) {
         this.swiping = true;
+      }
+      if (this.swiping) {
         dx = dx > 0 ? dx : 0;
         dx = dx < 60 ? dx : 60;
         this.transformTranslateX(dx);
@@ -2125,7 +2127,7 @@
       var dx, now;
       dx = this.last_touch.x - this.touch_start.x;
       now = new Date();
-      if (this.touching && !this.hovering && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
+      if (!this.hovering && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
         this.transformTranslateX(0);
         if (event.target === this.duration[0]) {
           this.toggleDuration();
@@ -2138,7 +2140,6 @@
         return this.item.save();
       } else {
         this.transformTranslateX(0, true);
-        this.touching = false;
         return this.hovering = false;
       }
     };
@@ -2147,13 +2148,7 @@
       var dx, dy;
       dx = this.last_touch.x - this.touch_start.x;
       dy = this.last_touch.y - this.touch_start.y;
-      if (Math.abs(dy) > 60) {
-        this.touching = false;
-        this.marked_done = false;
-        this.transformTranslateX(0, true);
-        this.content.removeClass("green");
-      }
-      if (this.touching && Math.abs(dx) <= this.config.touch_hold_dist_tolerance) {
+      if (!app.global_scrolling && Math.abs(dx) <= this.config.touch_hold_dist_tolerance) {
         this.hovering = true;
         this.transformTranslateX(0);
         return console.log("hovering task");
@@ -2421,6 +2416,7 @@
 }).call(this);
 (function() {
   var App,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -2428,7 +2424,20 @@
 
     __extends(App, _super);
 
+    App.prototype.events = {
+      "touchstart": "startTouching",
+      "touchmove": "continueTouching",
+      "touchend": "finishTouching"
+    };
+
+    App.prototype.config = {
+      touch_scroll_dist_tolerance: 5
+    };
+
     function App() {
+      this.stopTouching = __bind(this.stopTouching, this);
+      this.continueTouching = __bind(this.continueTouching, this);
+      this.startTouching = __bind(this.startTouching, this);
       var _this = this;
       App.__super__.constructor.apply(this, arguments);
       Agenda.bind("refresh", function() {
@@ -2450,6 +2459,30 @@
       });
       Task.fetch();
     }
+
+    App.prototype.startTouching = function(event) {
+      this.touch_start = {};
+      this.touch_last = {};
+      this.global_scrolling = false;
+      this.touch_start.x = event.originalEvent.touches[0].pageX;
+      this.touch_start.y = event.originalEvent.touches[0].pageY;
+      this.touch_last.x = this.touch_start.x;
+      return this.touch_last.y = this.touch_start.y;
+    };
+
+    App.prototype.continueTouching = function(event) {
+      var dy;
+      this.touch_last.x = event.originalEvent.touches[0].pageX;
+      this.touch_last.y = event.originalEvent.touches[0].pageY;
+      dy = this.touch_last.y - this.touch_start.y;
+      if (Math.abs(dy) > this.config.touch_scroll_dist_tolerance) {
+        return this.global_scrolling = true;
+      }
+    };
+
+    App.prototype.stopTouching = function(event) {
+      return this.global_scrolling = false;
+    };
 
     return App;
 
