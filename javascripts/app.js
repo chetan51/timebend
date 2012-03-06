@@ -1920,15 +1920,7 @@
 
   Touchable = {
     watchTouch: function() {
-      var _this = this;
-      this.touch_el = this.touch_el ? this.touch_el : this.el;
-      this.touch_el.bind('touchstart', function(e) {
-        return _this.touchable_startTouching(e);
-      });
-      this.touch_el.bind('touchmove', this.touchable_continueTouching);
-      return this.touch_el.bind('touchend', function(e) {
-        return _this.touchable_finishTouching(e);
-      });
+      return this.touch_el = this.touch_el ? this.touch_el : this.el;
     },
     touchable_startTouching: function(event) {
       this.touch_start = {};
@@ -2457,6 +2449,7 @@
         el: $("#tasks")
       });
       Task.fetch();
+      this.el.bind('touchmove', this.continueTouching);
       this.watchTouch();
     }
 
@@ -2465,8 +2458,7 @@
     };
 
     App.prototype.continueTouching = function(event) {
-      var dy;
-      return dy = this.touch_last.y - this.touch_start.y;
+      return console.log("whe");
     };
 
     App.prototype.finishTouching = function(event) {

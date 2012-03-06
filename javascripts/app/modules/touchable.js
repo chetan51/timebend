@@ -4,15 +4,7 @@
 
   Touchable = {
     watchTouch: function() {
-      var _this = this;
-      this.touch_el = this.touch_el ? this.touch_el : this.el;
-      this.touch_el.bind('touchstart', function(e) {
-        return _this.touchable_startTouching(e);
-      });
-      this.touch_el.bind('touchmove', this.touchable_continueTouching);
-      return this.touch_el.bind('touchend', function(e) {
-        return _this.touchable_finishTouching(e);
-      });
+      return this.touch_el = this.touch_el ? this.touch_el : this.el;
     },
     touchable_startTouching: function(event) {
       this.touch_start = {};
