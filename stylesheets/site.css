@@ -76,10 +76,8 @@ a {
 #status, .task {
   -webkit-user-select: none;
   -webkit-backface-visibility: hidden;
-  position: relative;
-  z-index: 1; }
+  position: relative; }
   #status .content, .task .content {
-    z-index: 1000;
     padding: 0 10px;
     font-size: 18px;
     font-weight: bold;
