@@ -84,7 +84,7 @@
       this.task_item.transformRotateX(this.rotate_x);
       this.after_todo = this.new_task.nextAll();
       return this.after_todo.transition({
-        y: '60px'
+        y: TaskItem.config.height + 'px'
       });
     };
 
@@ -94,7 +94,7 @@
       dy = event.originalEvent.touches[0].pageY - this.touch_start.y;
       this.rotate_x = dy > 0 ? -90 + dy : -90;
       this.rotate_x = this.rotate_x < 0 ? this.rotate_x : 0;
-      this.translate_y = dy < 60 ? dy : 60;
+      this.translate_y = dy < TaskItem.config.height ? dy : TaskItem.config.height;
       this.translate_y = this.translate_y > 0 ? this.translate_y : 0;
       this.task_item.transformRotateX(this.rotate_x);
       this.new_task.css({
@@ -148,10 +148,10 @@
       task_el = task.controller.el;
       this.after_todo = task_el.nextAll().add(task_el.parent().nextAll());
       this.after_todo.transition({
-        y: -60
+        y: -TaskItem.config.height
       });
       this.new_task.transition({
-        y: -60
+        y: -TaskItem.config.height
       });
       return task.controller.transformRotateX(-90, true, function() {
         _this.after_todo.css({

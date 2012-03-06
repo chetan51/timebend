@@ -10,6 +10,15 @@
 
     TaskItem.include(Touchable);
 
+    TaskItem.config = {
+      height: 40,
+      gutter_width: 36,
+      touch_tap_time_tolerance: 500,
+      touch_tap_dist_tolerance: 5,
+      touch_hold_dist_tolerance: 5,
+      touch_swipe_dist_tolerance: 15
+    };
+
     TaskItem.prototype.className = "task";
 
     TaskItem.prototype.elements = {
@@ -21,13 +30,6 @@
 
     TaskItem.prototype.events = {
       "focusout input[type='text']": "updateName"
-    };
-
-    TaskItem.prototype.config = {
-      touch_tap_time_tolerance: 500,
-      touch_tap_dist_tolerance: 5,
-      touch_hold_dist_tolerance: 5,
-      touch_swipe_dist_tolerance: 15
     };
 
     function TaskItem() {
@@ -76,7 +78,7 @@
 
     TaskItem.prototype.transformed = function() {
       return this.el.css({
-        'height': '60px',
+        'height': TaskItem.config.height + 'px',
         'z-index': '1'
       });
     };
@@ -151,19 +153,19 @@
     TaskItem.prototype.continueTouching = function(event) {
       var dx, updated_toggle_done;
       dx = this.touch_last.x - this.touch_start.x;
-      if (!this.hovering && !app.global_scrolling && Math.abs(dx) > this.config.touch_swipe_dist_tolerance) {
+      if (!this.hovering && !app.global_scrolling && Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance) {
         this.swiping = true;
       }
       if (this.swiping) {
         dx = dx > 0 ? dx : 0;
-        dx = dx < 60 ? dx : 60;
+        dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
         this.transformTranslateX(dx);
         if (this.item.done) {
-          this.transformCheckmarkOpacity(1 - (dx / 60));
+          this.transformCheckmarkOpacity(1 - (dx / TaskItem.config.gutter_width));
         } else {
-          this.transformCheckmarkOpacity(dx / 60);
+          this.transformCheckmarkOpacity(dx / TaskItem.config.gutter_width);
         }
-        updated_toggle_done = dx === 60 ? true : false;
+        updated_toggle_done = dx === TaskItem.config.gutter_width ? true : false;
         if (updated_toggle_done === !this.toggle_done) {
           if (this.item.done) {
             if (updated_toggle_done) {
@@ -188,7 +190,7 @@
       dx = this.touch_last.x - this.touch_start.x;
       this.touching = false;
       now = new Date();
-      if (!this.hovering && !app.global_scrolling && (now - this.touch_start.time < this.config.touch_tap_time_tolerance) && (Math.abs(dx) < this.config.touch_tap_dist_tolerance)) {
+      if (!this.hovering && !app.global_scrolling && (now - this.touch_start.time < TaskItem.config.touch_tap_time_tolerance) && (Math.abs(dx) < TaskItem.config.touch_tap_dist_tolerance)) {
         this.transformTranslateX(0);
         if (event.target === this.duration[0]) {
           this.toggleDuration();
@@ -209,7 +211,7 @@
       var dx, dy;
       dx = this.touch_last.x - this.touch_start.x;
       dy = this.touch_last.y - this.touch_start.y;
-      if (this.touching && !app.global_scrolling && Math.abs(dx) <= this.config.touch_hold_dist_tolerance) {
+      if (this.touching && !app.global_scrolling && Math.abs(dx) <= TaskItem.config.touch_hold_dist_tolerance) {
         this.hovering = true;
         this.transformTranslateX(0);
         return console.log("hovering task");

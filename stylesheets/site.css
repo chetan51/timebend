@@ -60,7 +60,8 @@ a {
 
 #wrapper {
   overflow-x: hidden;
-  overflow-y: scroll; }
+  overflow-y: scroll;
+  padding-bottom: 40px; }
 
 #templates {
   display: none; }
@@ -73,14 +74,12 @@ a {
   -webkit-backface-visibility: hidden; }
 
 #status, .task {
-  height: 60px;
   -webkit-user-select: none;
   -webkit-backface-visibility: hidden;
   position: relative;
   z-index: 1; }
   #status .content, .task .content {
     z-index: 1000;
-    height: 58px;
     padding: 0 10px;
     font-size: 18px;
     font-weight: bold;
@@ -92,12 +91,12 @@ a {
     top: 0;
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 40px;
     z-index: -1000; }
     #status .behind .check, #status .behind .cross, .task .behind .check, .task .behind .cross {
       display: block;
-      width: 55px;
-      height: 60px;
+      width: 36px;
+      height: 40px;
       position: absolute;
       top: 0; }
     #status .behind .check, .task .behind .check {
@@ -106,13 +105,15 @@ a {
       right: 0; }
 
 #status {
-  margin-bottom: 10px; }
+  height: 60px;
+  margin-bottom: 30px; }
   #status .content {
+    height: 58px;
     background-color: #00AA33; }
     #status .content #day-start, #status .content #day-end {
       position: absolute;
       top: 12px;
-      color: #000;
+      color: #111;
       text-align: center; }
       #status .content #day-start .time, #status .content #day-end .time {
         font-size: 18px; }
@@ -126,8 +127,8 @@ a {
     #status .content #day-end {
       right: 10px; }
     #status .content #reserve-left {
-      padding-left: 60px;
-      padding-right: 60px;
+      padding-left: 40px;
+      padding-right: 40px;
       padding-top: 5px;
       text-align: center; }
       #status .content #reserve-left .time {
@@ -135,54 +136,49 @@ a {
       #status .content #reserve-left .label {
         font-size: 12px; }
 
-.task .content {
-  background-color: #0086F3;
-  line-height: 58px; }
-  .task .content.green {
-    background-color: #00AA33 !important; }
-  .task .content.done {
-    background-color: #111 !important;
-    color: #555; }
-    .task .content.done .name input[type="text"] {
-      color: #555;
-      text-decoration: line-through; }
-.task .name {
-  position: relative;
-  padding-right: 70px; }
-  .task .name input[type="text"] {
-    width: 100%;
-    border: none;
-    background: transparent;
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 0;
-    margin: 0;
+.task {
+  height: 40px; }
+  .task .content {
+    height: 38px;
+    background-color: #0086F3;
+    line-height: 38px; }
+    .task .content.green {
+      background-color: #00AA33 !important; }
+    .task .content.done {
+      background-color: #222 !important;
+      color: #555; }
+      .task .content.done .name input[type="text"] {
+        color: #555;
+        text-decoration: line-through; }
+  .task .name {
     position: relative;
-    left: -1px; }
-.task .duration {
-  position: absolute;
-  right: 0;
-  top: -1px;
-  width: 60px;
-  height: 60px;
-  text-align: center;
-  line-height: 60px;
-  background-color: rgba(255, 255, 255, 0.15); }
+    padding-right: 70px; }
+    .task .name input[type="text"] {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 0;
+      margin: 0;
+      position: relative;
+      left: -1px; }
+  .task .duration {
+    position: absolute;
+    right: 0;
+    top: -1px;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    background-color: rgba(255, 255, 255, 0.15); }
 
 #new-task, #clear-tasks {
-  height: 60px;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #222222), color-stop(100%, #111111));
-  background-image: -webkit-linear-gradient(top, #222222, #111111);
-  background-image: -moz-linear-gradient(top, #222222, #111111);
-  background-image: -o-linear-gradient(top, #222222, #111111);
-  background-image: -ms-linear-gradient(top, #222222, #111111);
-  background-image: linear-gradient(top, #222222, #111111);
+  background: #111;
+  height: 40px;
   color: #777;
   font-size: 18px;
   font-weight: bold;
   text-align: center;
-  line-height: 60px; }
-
-#clear-tasks {
-  border-bottom: 1px solid #222; }
+  line-height: 40px; }
