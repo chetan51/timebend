@@ -2372,7 +2372,7 @@
       var dy;
       event.preventDefault();
       dy = event.originalEvent.touches[0].pageY - this.touch_start.y;
-      this.rotate_x = dy > 0 ? -90 + dy : -90;
+      this.rotate_x = dy > 0 ? -90 + (90 * dy / TaskItem.config.height) : -90;
       this.rotate_x = this.rotate_x < 0 ? this.rotate_x : 0;
       this.translate_y = dy < TaskItem.config.height ? dy : TaskItem.config.height;
       this.translate_y = this.translate_y > 0 ? this.translate_y : 0;
