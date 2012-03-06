@@ -2209,41 +2209,7 @@
       return delay(350, this.checkTouchStatus);
     };
 
-    TaskItem.prototype.continueTouching = function(event, data) {
-      var dx, updated_toggle_done;
-      this.touch_data = data;
-      dx = data.last.x - data.start.x;
-      if (!this.hovering && !app.global_scrolling && Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance) {
-        this.swiping = true;
-      }
-      if (this.swiping) {
-        dx = dx > 0 ? dx : 0;
-        dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
-        this.transformTranslateX(dx);
-        if (this.item.done) {
-          this.transformCheckmarkOpacity(1 - (dx / TaskItem.config.gutter_width));
-        } else {
-          this.transformCheckmarkOpacity(dx / TaskItem.config.gutter_width);
-        }
-        updated_toggle_done = dx === TaskItem.config.gutter_width ? true : false;
-        if (updated_toggle_done === !this.toggle_done) {
-          if (this.item.done) {
-            if (updated_toggle_done) {
-              this.content.removeClass("done");
-            } else {
-              this.content.addClass("done");
-            }
-          } else {
-            if (updated_toggle_done) {
-              this.content.addClass("green");
-            } else {
-              this.content.removeClass("green");
-            }
-          }
-        }
-        return this.toggle_done = updated_toggle_done;
-      }
-    };
+    TaskItem.prototype.continueTouching = function(event, data) {};
 
     TaskItem.prototype.finishTouching = function(event, data) {
       var dx, now;
@@ -2503,7 +2469,7 @@
 
     App.prototype.startTouching = function(event, data) {
       console.log(this.global_scrolling);
-      return this.global_scrolling = true;
+      return this.global_scrolling = false;
     };
 
     App.prototype.continueTouching = function(event, data) {
