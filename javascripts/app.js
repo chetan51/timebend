@@ -1915,12 +1915,21 @@
 
 }).call(this);
 (function() {
-  var Touchable,
-    _this = this;
+  var Touchable;
 
   Touchable = {
     watchTouch: function() {
-      return this.touch_el = this.touch_el ? this.touch_el : this.el;
+      var _this = this;
+      this.touch_el = this.touch_el ? this.touch_el : this.el;
+      this.touch_el.bind('touchstart', function(e) {
+        return _this.touchable_startTouching(e);
+      });
+      this.touch_el.bind('touchmove', function(e) {
+        return _this.touchable_continueTouching(e);
+      });
+      return this.touch_el.bind('touchend', function(e) {
+        return _this.touchable_finishTouching(e);
+      });
     },
     touchable_startTouching: function(event) {
       this.touch_start = {};
@@ -1933,7 +1942,9 @@
       return this.startTouching(event);
     },
     touchable_continueTouching: function(event) {
-      return console.log("lol");
+      this.touch_last.x = event.originalEvent.touches[0].pageX;
+      this.touch_last.y = event.originalEvent.touches[0].pageY;
+      return this.continueTouching(event);
     },
     touchable_finishTouching: function(event) {
       return this.finishTouching(event);
@@ -2189,8 +2200,38 @@
     };
 
     TaskItem.prototype.continueTouching = function(event) {
-      var dx;
-      return dx = this.touch_last.x - this.touch_start.x;
+      var dx, updated_toggle_done;
+      dx = this.touch_last.x - this.touch_start.x;
+      if (!this.hovering && !app.global_scrolling && Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance) {
+        this.swiping = true;
+      }
+      if (this.swiping) {
+        dx = dx > 0 ? dx : 0;
+        dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
+        this.transformTranslateX(dx);
+        if (this.item.done) {
+          this.transformCheckmarkOpacity(1 - (dx / TaskItem.config.gutter_width));
+        } else {
+          this.transformCheckmarkOpacity(dx / TaskItem.config.gutter_width);
+        }
+        updated_toggle_done = dx === TaskItem.config.gutter_width ? true : false;
+        if (updated_toggle_done === !this.toggle_done) {
+          if (this.item.done) {
+            if (updated_toggle_done) {
+              this.content.removeClass("done");
+            } else {
+              this.content.addClass("done");
+            }
+          } else {
+            if (updated_toggle_done) {
+              this.content.addClass("green");
+            } else {
+              this.content.removeClass("green");
+            }
+          }
+        }
+        return this.toggle_done = updated_toggle_done;
+      }
     };
 
     TaskItem.prototype.finishTouching = function(event) {
@@ -2216,8 +2257,9 @@
     };
 
     TaskItem.prototype.checkTouchStatus = function() {
-      var dx;
+      var dx, dy;
       dx = this.touch_last.x - this.touch_start.x;
+      dy = this.touch_last.y - this.touch_start.y;
       if (this.touching && !app.global_scrolling && Math.abs(dx) <= TaskItem.config.touch_hold_dist_tolerance) {
         this.hovering = true;
         this.transformTranslateX(0);
@@ -2449,7 +2491,6 @@
         el: $("#tasks")
       });
       Task.fetch();
-      this.el.bind('touchmove', this.continueTouching);
       this.watchTouch();
     }
 
@@ -2458,7 +2499,11 @@
     };
 
     App.prototype.continueTouching = function(event) {
-      return console.log("whe");
+      var dy;
+      dy = this.touch_last.y - this.touch_start.y;
+      if (Math.abs(dy) > App.config.touch_scroll_dist_tolerance) {
+        return this.global_scrolling = true;
+      }
     };
 
     App.prototype.finishTouching = function(event) {
