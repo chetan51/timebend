@@ -1937,6 +1937,11 @@
     TouchProxy.prototype.startTouching = function(event) {};
 
     TouchProxy.prototype.continueTouching = function(event) {
+      var last;
+      last = {};
+      last.x = event.originalEvent.touches[0].pageX;
+      last.y = event.originalEvent.touches[0].pageY;
+      this.data.last = last;
       return this.continueCallback(event, this.data);
     };
 
