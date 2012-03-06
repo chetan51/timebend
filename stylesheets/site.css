@@ -105,8 +105,7 @@ a {
       right: 0; }
 
 #status {
-  height: 60px;
-  margin-bottom: 30px; }
+  height: 60px; }
   #status .content {
     height: 58px;
     background-color: #00AA33; }
