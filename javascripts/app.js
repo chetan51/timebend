@@ -1957,7 +1957,6 @@
     };
 
     TouchProxy.prototype.finishTouching = function(event) {
-      console.log(this.el);
       this.finishCallback(event, this.data);
       return true;
     };
@@ -2095,8 +2094,13 @@
     };
 
     function TaskItem() {
-      this.toggleDuration = __bind(this.toggleDuration, this);
+      this.durationTapped = __bind(this.durationTapped, this);
+      this.taskHeld = __bind(this.taskHeld, this);
+      this.taskSwipeReleased = __bind(this.taskSwipeReleased, this);
+      this.taskSwiping = __bind(this.taskSwiping, this);
+      this.taskTapped = __bind(this.taskTapped, this);
       this.checkTouchStatus = __bind(this.checkTouchStatus, this);
+      this.normalizeSwipeDx = __bind(this.normalizeSwipeDx, this);
       this.finishTouching = __bind(this.finishTouching, this);
       this.continueTouching = __bind(this.continueTouching, this);
       this.startTouching = __bind(this.startTouching, this);
@@ -2206,24 +2210,76 @@
 
     TaskItem.prototype.startTouching = function(event, data) {
       this.touch_data = data;
-      this.touching = true;
-      this.hovering = false;
-      this.swiping = false;
-      this.toggle_done = false;
+      this.gesture = null;
       return delay(350, this.checkTouchStatus);
     };
 
     TaskItem.prototype.continueTouching = function(event, data) {
-      var dx, updated_toggle_done;
+      var dx;
       this.touch_data = data;
       dx = data.last.x - data.start.x;
-      if (!this.hovering && !app.global_scrolling && Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance) {
-        this.swiping = true;
+      if (!app.global_scrolling && !this.gesture && (Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance)) {
+        this.gesture = "swiping";
       }
-      if (this.swiping) {
-        dx = dx > 0 ? dx : 0;
-        dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
-        this.transformTranslateX(dx);
+      if (this.gesture === "swiping") {
+        dx = this.normalizeSwipeDx(dx);
+        return this.taskSwiping(dx);
+      }
+    };
+
+    TaskItem.prototype.finishTouching = function(event, data) {
+      var dx, now;
+      this.touch_data = data;
+      dx = data.last.x - data.start.x;
+      now = new Date();
+      if (!app.global_scrolling && !this.gesture && (now - data.start.time < TaskItem.config.touch_tap_time_tolerance) && (Math.abs(dx) < TaskItem.config.touch_tap_dist_tolerance)) {
+        this.gesture = "tapped";
+        if (event.target === this.duration[0]) {
+          return this.durationTapped();
+        } else {
+          return this.taskTapped();
+        }
+      } else if (this.gesture === "swiping") {
+        dx = this.normalizeSwipeDx(dx);
+        return this.taskSwipeReleased(dx);
+      }
+    };
+
+    TaskItem.prototype.normalizeSwipeDx = function(dx) {
+      var tolerance;
+      tolerance = TaskItem.config.touch_swipe_dist_tolerance;
+      if (dx > tolerance) {
+        dx -= tolerance;
+      } else if (dx < -tolerance) {
+        dx += tolerance;
+      } else {
+        dx = 0;
+      }
+      return dx;
+    };
+
+    TaskItem.prototype.checkTouchStatus = function() {
+      var dx;
+      dx = this.touch_data.last.x - this.touch_data.start.x;
+      if (!app.global_scrolling && !this.gesture && (Math.abs(dx) <= TaskItem.config.touch_hold_dist_tolerance)) {
+        this.gesture = "hold";
+        return this.taskHeld();
+      }
+    };
+
+    TaskItem.prototype.taskTapped = function() {
+      app.log("task tapped");
+      return this.editName();
+    };
+
+    TaskItem.prototype.taskSwiping = function(dx) {
+      var updated_toggle_done;
+      app.log("task swiping: " + dx);
+      dx = dx > 0 ? dx : 0;
+      dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
+      this.transformTranslateX(dx);
+      if (dx > 0) {
+        this.toggle_done = typeof this.toggle_done === "undefined" ? false : this.toggle_done;
         if (this.item.done) {
           this.transformCheckmarkOpacity(1 - (dx / TaskItem.config.gutter_width));
         } else {
@@ -2249,42 +2305,22 @@
       }
     };
 
-    TaskItem.prototype.finishTouching = function(event, data) {
-      var dx, now;
-      this.touch_data = data;
-      dx = data.last.x - data.start.x;
-      this.touching = false;
-      now = new Date();
-      if (!this.hovering && !app.global_scrolling && (now - data.start.time < TaskItem.config.touch_tap_time_tolerance) && (Math.abs(dx) < TaskItem.config.touch_tap_dist_tolerance)) {
-        this.transformTranslateX(0);
-        if (event.target === this.duration[0]) {
-          this.toggleDuration();
-        } else {
-          this.editName();
-        }
-      }
+    TaskItem.prototype.taskSwipeReleased = function(dx) {
+      app.log("task swipe released: " + dx);
       if (this.toggle_done) {
         this.item.done = !this.item.done;
         return this.item.save();
       } else {
-        this.transformTranslateX(0, true);
-        return this.hovering = false;
+        return this.transformTranslateX(0, true);
       }
     };
 
-    TaskItem.prototype.checkTouchStatus = function() {
-      var dx, dy;
-      dx = this.touch_data.last.x - this.touch_data.start.x;
-      dy = this.touch_data.last.y - this.touch_data.start.y;
-      if (this.touching && !app.global_scrolling && Math.abs(dx) <= TaskItem.config.touch_hold_dist_tolerance) {
-        this.hovering = true;
-        this.transformTranslateX(0);
-        return console.log("hovering task");
-      }
+    TaskItem.prototype.taskHeld = function() {
+      return app.log("task held");
     };
 
-    TaskItem.prototype.toggleDuration = function() {
-      return console.log("toggling duration");
+    TaskItem.prototype.durationTapped = function() {
+      return app.log("duration tapped");
     };
 
     return TaskItem;
@@ -2309,12 +2345,15 @@
     Tasks.prototype.elements = {
       "#todo": "todo",
       "#done": "done",
-      "#new-task": "new_task",
-      "#clear-tasks": "clear_tasks"
+      "#new-task": "new_task_bar",
+      "#clear-tasks": "clear_tasks_bar"
     };
 
     function Tasks() {
       this["delete"] = __bind(this["delete"], this);
+      this.newTaskBarSwipeReleased = __bind(this.newTaskBarSwipeReleased, this);
+      this.newTaskBarSwiping = __bind(this.newTaskBarSwiping, this);
+      this.newTaskBarTouched = __bind(this.newTaskBarTouched, this);
       this.finishTouching = __bind(this.finishTouching, this);
       this.continueTouching = __bind(this.continueTouching, this);
       this.startTouching = __bind(this.startTouching, this);
@@ -2325,16 +2364,16 @@
       Task.bind("refresh", this.render);
       Task.bind("create", this.addOne);
       Tasks.bind("task:delete", this["delete"]);
-      this.touch_proxy = new TouchProxy(this.new_task, this.startTouching, this.continueTouching, this.finishTouching);
+      this.touch_proxy = new TouchProxy(this.new_task_bar, this.startTouching, this.continueTouching, this.finishTouching);
     }
 
     Tasks.prototype.render = function() {
       this.todo.html("");
       this.done.html("");
       if (Task.finished().length === 0) {
-        this.clear_tasks.hide();
+        this.clear_tasks_bar.hide();
       } else {
-        this.clear_tasks.show();
+        this.clear_tasks_bar.show();
       }
       return this.addAll();
     };
@@ -2359,10 +2398,27 @@
     };
 
     Tasks.prototype.startTouching = function(event, data) {
+      return this.newTaskBarTouched();
+    };
+
+    Tasks.prototype.continueTouching = function(event, data) {
+      var dy;
+      event.preventDefault();
+      dy = data.last.y - data.start.y;
+      return this.newTaskBarSwiping(dy);
+    };
+
+    Tasks.prototype.finishTouching = function(event, data) {
+      var dy;
+      dy = data.last.y - data.start.y;
+      return this.newTaskBarSwipeReleased(dy);
+    };
+
+    Tasks.prototype.newTaskBarTouched = function() {
+      var after_todo;
+      app.log("new task touched");
       this.task = null;
       this.task_item = null;
-      this.rotate_x = 0;
-      this.translate_y = 0;
       this.create = false;
       this.task = Task.init({
         duration: 1,
@@ -2371,29 +2427,27 @@
       this.task_item = new TaskItem({
         item: this.task
       });
-      this.addTaskItemToList(this.task_item, this.todo);
       this.task_item.transforming();
-      this.rotate_x = -90;
-      this.task_item.transformRotateX(this.rotate_x);
-      this.after_todo = this.new_task.nextAll();
-      return this.after_todo.transition({
+      this.task_item.transformRotateX(-90);
+      this.addTaskItemToList(this.task_item, this.todo);
+      after_todo = this.new_task_bar.nextAll();
+      return after_todo.transition({
         y: TaskItem.config.height + 'px'
       });
     };
 
-    Tasks.prototype.continueTouching = function(event, data) {
-      var dy;
-      event.preventDefault();
-      dy = event.originalEvent.touches[0].pageY - data.start.y;
-      this.rotate_x = dy > 0 ? -90 + (90 * dy / TaskItem.config.height) : -90;
-      this.rotate_x = this.rotate_x < 0 ? this.rotate_x : 0;
-      this.translate_y = dy < TaskItem.config.height ? dy : TaskItem.config.height;
-      this.translate_y = this.translate_y > 0 ? this.translate_y : 0;
-      this.task_item.transformRotateX(this.rotate_x);
-      this.new_task.css({
-        y: this.translate_y
+    Tasks.prototype.newTaskBarSwiping = function(dy) {
+      var rotate_x, translate_y;
+      app.log("new task swiping: " + dy);
+      rotate_x = dy > 0 ? -90 + (90 * dy / TaskItem.config.height) : -90;
+      rotate_x = rotate_x < 0 ? rotate_x : 0;
+      this.task_item.transformRotateX(rotate_x);
+      translate_y = dy < TaskItem.config.height ? dy : TaskItem.config.height;
+      translate_y = translate_y > 0 ? translate_y : 0;
+      this.new_task_bar.css({
+        y: translate_y
       });
-      if (this.rotate_x === 0) {
+      if (rotate_x === 0) {
         if (!this.create) {
           this.task.name = "Release to create task";
           this.task_item.render();
@@ -2408,25 +2462,28 @@
       }
     };
 
-    Tasks.prototype.finishTouching = function(event, data) {
-      var _this = this;
+    Tasks.prototype.newTaskBarSwipeReleased = function(dy) {
+      var after_todo,
+        _this = this;
+      app.log("new task swipe released: " + dy);
+      after_todo = this.new_task_bar.nextAll();
       if (this.create) {
         this.task.save({
           silent: true
         });
         this.task_item.transformed();
-        this.after_todo.css({
+        after_todo.css({
           y: 0
         });
-        this.new_task.css({
+        this.new_task_bar.css({
           y: 0
         });
         return this.task_item.startEditingName();
       } else {
-        this.after_todo.transition({
+        after_todo.transition({
           y: 0
         });
-        this.new_task.transition({
+        this.new_task_bar.transition({
           y: 0
         });
         return this.task_item.transformRotateX(-90, true, function() {
@@ -2443,17 +2500,11 @@
       this.after_todo.transition({
         y: -TaskItem.config.height
       });
-      this.new_task.transition({
-        y: -TaskItem.config.height
-      });
       return task.controller.transformRotateX(-90, true, function() {
-        _this.after_todo.css({
+        task.destroy();
+        return _this.after_todo.css({
           y: 0
         });
-        _this.new_task.css({
-          y: 0
-        });
-        return task.destroy();
       });
     };
 
@@ -2475,6 +2526,7 @@
     __extends(App, _super);
 
     App.config = {
+      debugging: true,
       touch_scroll_dist_tolerance: 5
     };
 
@@ -2519,6 +2571,10 @@
 
     App.prototype.finishTouching = function(event, data) {
       return this.global_scrolling = false;
+    };
+
+    App.prototype.log = function(message) {
+      if (App.config.debugging) return console.log(message);
     };
 
     return App;

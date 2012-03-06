@@ -13,12 +13,15 @@
     Tasks.prototype.elements = {
       "#todo": "todo",
       "#done": "done",
-      "#new-task": "new_task",
-      "#clear-tasks": "clear_tasks"
+      "#new-task": "new_task_bar",
+      "#clear-tasks": "clear_tasks_bar"
     };
 
     function Tasks() {
       this["delete"] = __bind(this["delete"], this);
+      this.newTaskBarSwipeReleased = __bind(this.newTaskBarSwipeReleased, this);
+      this.newTaskBarSwiping = __bind(this.newTaskBarSwiping, this);
+      this.newTaskBarTouched = __bind(this.newTaskBarTouched, this);
       this.finishTouching = __bind(this.finishTouching, this);
       this.continueTouching = __bind(this.continueTouching, this);
       this.startTouching = __bind(this.startTouching, this);
@@ -29,16 +32,16 @@
       Task.bind("refresh", this.render);
       Task.bind("create", this.addOne);
       Tasks.bind("task:delete", this["delete"]);
-      this.touch_proxy = new TouchProxy(this.new_task, this.startTouching, this.continueTouching, this.finishTouching);
+      this.touch_proxy = new TouchProxy(this.new_task_bar, this.startTouching, this.continueTouching, this.finishTouching);
     }
 
     Tasks.prototype.render = function() {
       this.todo.html("");
       this.done.html("");
       if (Task.finished().length === 0) {
-        this.clear_tasks.hide();
+        this.clear_tasks_bar.hide();
       } else {
-        this.clear_tasks.show();
+        this.clear_tasks_bar.show();
       }
       return this.addAll();
     };
@@ -63,10 +66,27 @@
     };
 
     Tasks.prototype.startTouching = function(event, data) {
+      return this.newTaskBarTouched();
+    };
+
+    Tasks.prototype.continueTouching = function(event, data) {
+      var dy;
+      event.preventDefault();
+      dy = data.last.y - data.start.y;
+      return this.newTaskBarSwiping(dy);
+    };
+
+    Tasks.prototype.finishTouching = function(event, data) {
+      var dy;
+      dy = data.last.y - data.start.y;
+      return this.newTaskBarSwipeReleased(dy);
+    };
+
+    Tasks.prototype.newTaskBarTouched = function() {
+      var after_todo;
+      app.log("new task touched");
       this.task = null;
       this.task_item = null;
-      this.rotate_x = 0;
-      this.translate_y = 0;
       this.create = false;
       this.task = Task.init({
         duration: 1,
@@ -75,29 +95,27 @@
       this.task_item = new TaskItem({
         item: this.task
       });
-      this.addTaskItemToList(this.task_item, this.todo);
       this.task_item.transforming();
-      this.rotate_x = -90;
-      this.task_item.transformRotateX(this.rotate_x);
-      this.after_todo = this.new_task.nextAll();
-      return this.after_todo.transition({
+      this.task_item.transformRotateX(-90);
+      this.addTaskItemToList(this.task_item, this.todo);
+      after_todo = this.new_task_bar.nextAll();
+      return after_todo.transition({
         y: TaskItem.config.height + 'px'
       });
     };
 
-    Tasks.prototype.continueTouching = function(event, data) {
-      var dy;
-      event.preventDefault();
-      dy = event.originalEvent.touches[0].pageY - data.start.y;
-      this.rotate_x = dy > 0 ? -90 + (90 * dy / TaskItem.config.height) : -90;
-      this.rotate_x = this.rotate_x < 0 ? this.rotate_x : 0;
-      this.translate_y = dy < TaskItem.config.height ? dy : TaskItem.config.height;
-      this.translate_y = this.translate_y > 0 ? this.translate_y : 0;
-      this.task_item.transformRotateX(this.rotate_x);
-      this.new_task.css({
-        y: this.translate_y
+    Tasks.prototype.newTaskBarSwiping = function(dy) {
+      var rotate_x, translate_y;
+      app.log("new task swiping: " + dy);
+      rotate_x = dy > 0 ? -90 + (90 * dy / TaskItem.config.height) : -90;
+      rotate_x = rotate_x < 0 ? rotate_x : 0;
+      this.task_item.transformRotateX(rotate_x);
+      translate_y = dy < TaskItem.config.height ? dy : TaskItem.config.height;
+      translate_y = translate_y > 0 ? translate_y : 0;
+      this.new_task_bar.css({
+        y: translate_y
       });
-      if (this.rotate_x === 0) {
+      if (rotate_x === 0) {
         if (!this.create) {
           this.task.name = "Release to create task";
           this.task_item.render();
@@ -112,25 +130,28 @@
       }
     };
 
-    Tasks.prototype.finishTouching = function(event, data) {
-      var _this = this;
+    Tasks.prototype.newTaskBarSwipeReleased = function(dy) {
+      var after_todo,
+        _this = this;
+      app.log("new task swipe released: " + dy);
+      after_todo = this.new_task_bar.nextAll();
       if (this.create) {
         this.task.save({
           silent: true
         });
         this.task_item.transformed();
-        this.after_todo.css({
+        after_todo.css({
           y: 0
         });
-        this.new_task.css({
+        this.new_task_bar.css({
           y: 0
         });
         return this.task_item.startEditingName();
       } else {
-        this.after_todo.transition({
+        after_todo.transition({
           y: 0
         });
-        this.new_task.transition({
+        this.new_task_bar.transition({
           y: 0
         });
         return this.task_item.transformRotateX(-90, true, function() {
@@ -147,17 +168,11 @@
       this.after_todo.transition({
         y: -TaskItem.config.height
       });
-      this.new_task.transition({
-        y: -TaskItem.config.height
-      });
       return task.controller.transformRotateX(-90, true, function() {
-        _this.after_todo.css({
+        task.destroy();
+        return _this.after_todo.css({
           y: 0
         });
-        _this.new_task.css({
-          y: 0
-        });
-        return task.destroy();
       });
     };
 
