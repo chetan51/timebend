@@ -243,10 +243,14 @@
     };
 
     TaskItem.prototype.taskSwipeReleased = function(dx) {
+      var _this = this;
       app.log("task swipe released: " + dx);
       if (this.toggle_done) {
         this.item.done = !this.item.done;
-        return this.item.save();
+        if (this.item.done) this.content.removeClass("green").addClass("done");
+        return this.transformTranslateX(0, true, function() {
+          return _this.item.save();
+        });
       } else {
         return this.transformTranslateX(0, true);
       }
