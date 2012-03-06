@@ -10,8 +10,6 @@
 
     Tasks.extend(Spine.Events);
 
-    Tasks.include(Touchable);
-
     Tasks.prototype.elements = {
       "#todo": "todo",
       "#done": "done",
@@ -31,8 +29,7 @@
       Task.bind("refresh", this.render);
       Task.bind("create", this.addOne);
       Tasks.bind("task:delete", this["delete"]);
-      this.touch_el = this.new_task;
-      this.watchTouch();
+      this.touch_proxy = new TouchProxy(this.new_task, this.startTouching, this.continueTouching, this.finishTouching);
     }
 
     Tasks.prototype.render = function() {
@@ -65,7 +62,7 @@
       return Task.each(this.addOne);
     };
 
-    Tasks.prototype.startTouching = function(event) {
+    Tasks.prototype.startTouching = function(event, data) {
       this.task = null;
       this.task_item = null;
       this.rotate_x = 0;
@@ -88,10 +85,10 @@
       });
     };
 
-    Tasks.prototype.continueTouching = function(event) {
+    Tasks.prototype.continueTouching = function(event, data) {
       var dy;
       event.preventDefault();
-      dy = event.originalEvent.touches[0].pageY - this.touch_start.y;
+      dy = event.originalEvent.touches[0].pageY - data.start.y;
       this.rotate_x = dy > 0 ? -90 + (90 * dy / TaskItem.config.height) : -90;
       this.rotate_x = this.rotate_x < 0 ? this.rotate_x : 0;
       this.translate_y = dy < TaskItem.config.height ? dy : TaskItem.config.height;
@@ -115,7 +112,7 @@
       }
     };
 
-    Tasks.prototype.finishTouching = function(event) {
+    Tasks.prototype.finishTouching = function(event, data) {
       var _this = this;
       if (this.create) {
         this.task.save({

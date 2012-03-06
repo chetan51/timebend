@@ -8,8 +8,6 @@
 
     __extends(TaskItem, _super);
 
-    TaskItem.include(Touchable);
-
     TaskItem.config = {
       height: 40,
       gutter_width: 36,
@@ -53,7 +51,7 @@
       if (!this.item) throw "@item required";
       this.item.bind("update", this.render);
       this.item.bind("destroy", this.remove);
-      this.watchTouch();
+      this.touch_proxy = new TouchProxy(this.el, this.startTouching, this.continueTouching, this.finishTouching);
     }
 
     TaskItem.prototype.template = function(item) {
@@ -142,7 +140,8 @@
       return this.el.remove();
     };
 
-    TaskItem.prototype.startTouching = function(event) {
+    TaskItem.prototype.startTouching = function(event, data) {
+      this.touch_data = data;
       this.touching = true;
       this.hovering = false;
       this.swiping = false;
@@ -150,9 +149,10 @@
       return delay(350, this.checkTouchStatus);
     };
 
-    TaskItem.prototype.continueTouching = function(event) {
+    TaskItem.prototype.continueTouching = function(event, data) {
       var dx, updated_toggle_done;
-      dx = this.touch_last.x - this.touch_start.x;
+      this.touch_data = data;
+      dx = data.last.x - data.start.x;
       if (!this.hovering && !app.global_scrolling && Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance) {
         this.swiping = true;
       }
@@ -185,12 +185,13 @@
       }
     };
 
-    TaskItem.prototype.finishTouching = function(event) {
+    TaskItem.prototype.finishTouching = function(event, data) {
       var dx, now;
-      dx = this.touch_last.x - this.touch_start.x;
+      this.touch_data = data;
+      dx = data.last.x - data.start.x;
       this.touching = false;
       now = new Date();
-      if (!this.hovering && !app.global_scrolling && (now - this.touch_start.time < TaskItem.config.touch_tap_time_tolerance) && (Math.abs(dx) < TaskItem.config.touch_tap_dist_tolerance)) {
+      if (!this.hovering && !app.global_scrolling && (now - data.start.time < TaskItem.config.touch_tap_time_tolerance) && (Math.abs(dx) < TaskItem.config.touch_tap_dist_tolerance)) {
         this.transformTranslateX(0);
         if (event.target === this.duration[0]) {
           this.toggleDuration();
@@ -209,8 +210,8 @@
 
     TaskItem.prototype.checkTouchStatus = function() {
       var dx, dy;
-      dx = this.touch_last.x - this.touch_start.x;
-      dy = this.touch_last.y - this.touch_start.y;
+      dx = this.touch_data.last.x - this.touch_data.start.x;
+      dy = this.touch_data.last.y - this.touch_data.start.y;
       if (this.touching && !app.global_scrolling && Math.abs(dx) <= TaskItem.config.touch_hold_dist_tolerance) {
         this.hovering = true;
         this.transformTranslateX(0);
