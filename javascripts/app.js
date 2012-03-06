@@ -1934,29 +1934,11 @@
       this.el.bind('touchend', this.finishTouching);
     }
 
-    TouchProxy.prototype.startTouching = function(event) {
-      var start;
-      start = {};
-      start.x = event.originalEvent.touches[0].pageX;
-      start.y = event.originalEvent.touches[0].pageY;
-      start.time = new Date();
-      this.data.start = start;
-      this.data.last = start;
-      return this.startCallback(event, this.data);
-    };
+    TouchProxy.prototype.startTouching = function(event) {};
 
-    TouchProxy.prototype.continueTouching = function(event) {
-      var last;
-      last = {};
-      last.x = event.originalEvent.touches[0].pageX;
-      last.y = event.originalEvent.touches[0].pageY;
-      this.data.last = last;
-      return this.continueCallback(event, this.data);
-    };
+    TouchProxy.prototype.continueTouching = function(event) {};
 
-    TouchProxy.prototype.finishTouching = function(event) {
-      return this.finishCallback(event, this.data);
-    };
+    TouchProxy.prototype.finishTouching = function(event) {};
 
     return TouchProxy;
 
