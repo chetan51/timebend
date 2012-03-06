@@ -3,7 +3,17 @@
 
   Touchable = {
     watchTouch: function() {
-      return this.touch_el = this.touch_el ? this.touch_el : this.el;
+      var _this = this;
+      this.touch_el = this.touch_el ? this.touch_el : this.el;
+      this.touch_el.bind('touchstart', function(e) {
+        return _this.touchable_startTouching(e);
+      });
+      this.touch_el.bind('touchmove', function(e) {
+        return _this.touchable_continueTouching(e);
+      });
+      return this.touch_el.bind('touchend', function(e) {
+        return _this.touchable_finishTouching(e);
+      });
     },
     touchable_startTouching: function(event) {
       this.touch_start = {};

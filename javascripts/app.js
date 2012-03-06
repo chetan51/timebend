@@ -1919,7 +1919,17 @@
 
   Touchable = {
     watchTouch: function() {
-      return this.touch_el = this.touch_el ? this.touch_el : this.el;
+      var _this = this;
+      this.touch_el = this.touch_el ? this.touch_el : this.el;
+      this.touch_el.bind('touchstart', function(e) {
+        return _this.touchable_startTouching(e);
+      });
+      this.touch_el.bind('touchmove', function(e) {
+        return _this.touchable_continueTouching(e);
+      });
+      return this.touch_el.bind('touchend', function(e) {
+        return _this.touchable_finishTouching(e);
+      });
     },
     touchable_startTouching: function(event) {
       this.touch_start = {};
@@ -2190,38 +2200,8 @@
     };
 
     TaskItem.prototype.continueTouching = function(event) {
-      var dx, updated_toggle_done;
-      dx = this.touch_last.x - this.touch_start.x;
-      if (!this.hovering && !app.global_scrolling && Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance) {
-        this.swiping = true;
-      }
-      if (false) {
-        dx = dx > 0 ? dx : 0;
-        dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
-        this.transformTranslateX(dx);
-        if (this.item.done) {
-          this.transformCheckmarkOpacity(1 - (dx / TaskItem.config.gutter_width));
-        } else {
-          this.transformCheckmarkOpacity(dx / TaskItem.config.gutter_width);
-        }
-        updated_toggle_done = dx === TaskItem.config.gutter_width ? true : false;
-        if (updated_toggle_done === !this.toggle_done) {
-          if (this.item.done) {
-            if (updated_toggle_done) {
-              this.content.removeClass("done");
-            } else {
-              this.content.addClass("done");
-            }
-          } else {
-            if (updated_toggle_done) {
-              this.content.addClass("green");
-            } else {
-              this.content.removeClass("green");
-            }
-          }
-        }
-        return this.toggle_done = updated_toggle_done;
-      }
+      var dx;
+      return dx = this.touch_last.x - this.touch_start.x;
     };
 
     TaskItem.prototype.finishTouching = function(event) {
@@ -2489,10 +2469,7 @@
 
     App.prototype.continueTouching = function(event) {
       var dy;
-      dy = this.touch_last.y - this.touch_start.y;
-      if (Math.abs(dy) > App.config.touch_scroll_dist_tolerance) {
-        return this.global_scrolling = true;
-      }
+      return dy = this.touch_last.y - this.touch_start.y;
     };
 
     App.prototype.finishTouching = function(event) {
