@@ -1915,7 +1915,8 @@
 
 }).call(this);
 (function() {
-  var Touchable;
+  var Touchable,
+    _this = this;
 
   Touchable = {
     watchTouch: function() {
@@ -1940,7 +1941,7 @@
       return this.startTouching(event);
     },
     touchable_continueTouching: function(event) {
-      return event;
+      return console.log("lol");
     },
     touchable_finishTouching: function(event) {
       return this.finishTouching(event);
