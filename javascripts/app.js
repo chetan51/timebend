@@ -2205,7 +2205,7 @@
       if (!this.hovering && !app.global_scrolling && Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance) {
         this.swiping = true;
       }
-      if (this.swiping) {
+      if (false) {
         dx = dx > 0 ? dx : 0;
         dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
         this.transformTranslateX(dx);
@@ -2257,9 +2257,8 @@
     };
 
     TaskItem.prototype.checkTouchStatus = function() {
-      var dx, dy;
+      var dx;
       dx = this.touch_last.x - this.touch_start.x;
-      dy = this.touch_last.y - this.touch_start.y;
       if (this.touching && !app.global_scrolling && Math.abs(dx) <= TaskItem.config.touch_hold_dist_tolerance) {
         this.hovering = true;
         this.transformTranslateX(0);
