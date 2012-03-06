@@ -1939,7 +1939,9 @@
       this.touch_last.y = this.touch_start.y;
       return this.startTouching(event);
     },
-    touchable_continueTouching: function(event) {},
+    touchable_continueTouching: function(event) {
+      return event;
+    },
     touchable_finishTouching: function(event) {
       return this.finishTouching(event);
     }
