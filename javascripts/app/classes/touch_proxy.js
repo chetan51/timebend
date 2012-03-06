@@ -20,7 +20,9 @@
 
     TouchProxy.prototype.startTouching = function(event) {};
 
-    TouchProxy.prototype.continueTouching = function(event) {};
+    TouchProxy.prototype.continueTouching = function(event) {
+      return this.continueCallback(event, this.data);
+    };
 
     TouchProxy.prototype.finishTouching = function(event) {};
 
