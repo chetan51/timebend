@@ -30,6 +30,11 @@
 		<script type="text/javascript" charset="utf-8">
 			$('document').ready(function(){
 				window.app = new App({el: $(document)});      
+
+        // For testing on the desktop
+        if (!!('ontouchstart' in window) ? 0 : 1) {
+          phantom(true);
+        }
 			});
 		</script>
 

@@ -11,7 +11,7 @@
       Task.__super__.constructor.apply(this, arguments);
     }
 
-    Task.configure('Task', 'name', 'duration', 'done');
+    Task.configure('Task', 'name', 'duration', 'done', 'order_index');
 
     Task.extend(Spine.Model.Local);
 

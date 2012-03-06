@@ -46,11 +46,12 @@
       this.startEditingName = __bind(this.startEditingName, this);
       this.editName = __bind(this.editName, this);
       this.transformCheckmarkOpacity = __bind(this.transformCheckmarkOpacity, this);
-      this.transformTranslateX = __bind(this.transformTranslateX, this);
-      this.transformRotateX = __bind(this.transformRotateX, this);
+      this.transformContentMoveHoriz = __bind(this.transformContentMoveHoriz, this);
+      this.transformMoveVert = __bind(this.transformMoveVert, this);
+      this.transformFlipVert = __bind(this.transformFlipVert, this);
       this.transform = __bind(this.transform, this);
-      this.transformed = __bind(this.transformed, this);
-      this.transforming = __bind(this.transforming, this);
+      this.created = __bind(this.created, this);
+      this.creating = __bind(this.creating, this);
       this.render = __bind(this.render, this);
       this.template = __bind(this.template, this);      TaskItem.__super__.constructor.apply(this, arguments);
       if (!this.item) throw "@item required";
@@ -72,14 +73,14 @@
       return this;
     };
 
-    TaskItem.prototype.transforming = function() {
+    TaskItem.prototype.creating = function() {
       return this.el.css({
         'height': '0',
         'z-index': '-1'
       });
     };
 
-    TaskItem.prototype.transformed = function() {
+    TaskItem.prototype.created = function() {
       return this.el.css({
         'height': TaskItem.config.height + 'px',
         'z-index': '1'
@@ -106,14 +107,18 @@
       }
     };
 
-    TaskItem.prototype.transformRotateX = function(dist, animated, callback) {
+    TaskItem.prototype.transformFlipVert = function(dist, animated, callback) {
       this.el.css({
         transformOrigin: '50% 0'
       });
       return this.transform(this.el, 'rotateX', dist, 'deg', animated, callback);
     };
 
-    TaskItem.prototype.transformTranslateX = function(dist, animated, callback) {
+    TaskItem.prototype.transformMoveVert = function(dist, animated, callback) {
+      return this.transform(this.el, 'y', dist, '', animated, callback);
+    };
+
+    TaskItem.prototype.transformContentMoveHoriz = function(dist, animated, callback) {
       return this.transform(this.content, 'x', dist, '', animated, callback);
     };
 
@@ -214,7 +219,7 @@
       app.log("task swiping: " + dx);
       dx = dx > 0 ? dx : 0;
       dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
-      this.transformTranslateX(dx);
+      this.transformContentMoveHoriz(dx);
       if (dx > 0) {
         this.toggle_done = typeof this.toggle_done === "undefined" ? false : this.toggle_done;
         if (this.item.done) {
@@ -243,16 +248,21 @@
     };
 
     TaskItem.prototype.taskSwipeReleased = function(dx) {
-      var _this = this;
+      var last_task, tasks,
+        _this = this;
       app.log("task swipe released: " + dx);
       if (this.toggle_done) {
         this.item.done = !this.item.done;
+        tasks = this.item.done ? Task.finished() : Task.unfinished();
+        last_task = tasks[tasks.length - 1];
+        this.item.order_index = last_task.order_index + 1;
         if (this.item.done) this.content.removeClass("green").addClass("done");
-        return this.transformTranslateX(0, true, function() {
-          return _this.item.save();
+        return this.transformContentMoveHoriz(0, true, function() {
+          _this.item.save();
+          return Tasks.trigger('task:toggle_done', _this.item);
         });
       } else {
-        return this.transformTranslateX(0, true);
+        return this.transformContentMoveHoriz(0, true);
       }
     };
 
