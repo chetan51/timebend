@@ -1954,7 +1954,9 @@
       return this.continueCallback(event, this.data);
     };
 
-    TouchProxy.prototype.finishTouching = function(event) {};
+    TouchProxy.prototype.finishTouching = function(event) {
+      return this.finishCallback(event, this.data);
+    };
 
     return TouchProxy;
 
@@ -2499,11 +2501,15 @@
       this.touch_proxy = new TouchProxy(this.el, this.startTouching, this.continueTouching, this.finishTouching);
     }
 
-    App.prototype.startTouching = function(event, data) {
-      return this.global_scrolling = false;
-    };
+    App.prototype.startTouching = function(event, data) {};
 
-    App.prototype.continueTouching = function(event, data) {};
+    App.prototype.continueTouching = function(event, data) {
+      var dy;
+      dy = data.last.y - data.start.y;
+      if (Math.abs(dy) > App.config.touch_scroll_dist_tolerance) {
+        return this.global_scrolling = true;
+      }
+    };
 
     App.prototype.finishTouching = function(event, data) {
       return this.global_scrolling = false;
