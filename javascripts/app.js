@@ -2318,7 +2318,7 @@
         this.item.done = !this.item.done;
         tasks = this.item.done ? Task.finished() : Task.unfinished();
         last_task = tasks[tasks.length - 1];
-        this.item.order_index = last_task.order_index + 1;
+        this.item.order_index = last_task ? last_task.order_index + 1 : 0;
         if (this.item.done) this.content.removeClass("green").addClass("done");
         return this.transformContentMoveHoriz(0, true, function() {
           _this.item.save();
