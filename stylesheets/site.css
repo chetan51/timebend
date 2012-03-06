@@ -74,7 +74,6 @@ a {
   -webkit-backface-visibility: hidden; }
 
 #status, .task {
-  -webkit-user-select: none;
   -webkit-backface-visibility: hidden;
   position: relative; }
   #status .content, .task .content {
@@ -178,4 +177,5 @@ a {
   font-size: 18px;
   font-weight: bold;
   text-align: center;
-  line-height: 40px; }
+  line-height: 40px;
+  -webkit-user-select: none; }
