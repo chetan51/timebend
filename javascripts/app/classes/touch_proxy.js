@@ -39,6 +39,7 @@
     };
 
     TouchProxy.prototype.finishTouching = function(event) {
+      console.log(this.el);
       return this.finishCallback(event, this.data);
     };
 

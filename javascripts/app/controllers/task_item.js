@@ -149,7 +149,41 @@
       return delay(350, this.checkTouchStatus);
     };
 
-    TaskItem.prototype.continueTouching = function(event, data) {};
+    TaskItem.prototype.continueTouching = function(event, data) {
+      var dx, updated_toggle_done;
+      this.touch_data = data;
+      dx = data.last.x - data.start.x;
+      if (!this.hovering && !app.global_scrolling && Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance) {
+        this.swiping = true;
+      }
+      if (this.swiping) {
+        dx = dx > 0 ? dx : 0;
+        dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
+        this.transformTranslateX(dx);
+        if (this.item.done) {
+          this.transformCheckmarkOpacity(1 - (dx / TaskItem.config.gutter_width));
+        } else {
+          this.transformCheckmarkOpacity(dx / TaskItem.config.gutter_width);
+        }
+        updated_toggle_done = dx === TaskItem.config.gutter_width ? true : false;
+        if (updated_toggle_done === !this.toggle_done) {
+          if (this.item.done) {
+            if (updated_toggle_done) {
+              this.content.removeClass("done");
+            } else {
+              this.content.addClass("done");
+            }
+          } else {
+            if (updated_toggle_done) {
+              this.content.addClass("green");
+            } else {
+              this.content.removeClass("green");
+            }
+          }
+        }
+        return this.toggle_done = updated_toggle_done;
+      }
+    };
 
     TaskItem.prototype.finishTouching = function(event, data) {
       var dx, now;
@@ -167,11 +201,12 @@
       }
       if (this.toggle_done) {
         this.item.done = !this.item.done;
-        return this.item.save();
+        this.item.save();
       } else {
         this.transformTranslateX(0, true);
-        return this.hovering = false;
+        this.hovering = false;
       }
+      return true;
     };
 
     TaskItem.prototype.checkTouchStatus = function() {
