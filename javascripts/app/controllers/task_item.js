@@ -201,12 +201,11 @@
       }
       if (this.toggle_done) {
         this.item.done = !this.item.done;
-        this.item.save();
+        return this.item.save();
       } else {
         this.transformTranslateX(0, true);
-        this.hovering = false;
+        return this.hovering = false;
       }
-      return true;
     };
 
     TaskItem.prototype.checkTouchStatus = function() {

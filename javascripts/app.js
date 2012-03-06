@@ -1942,7 +1942,8 @@
       start.time = new Date();
       this.data.start = start;
       this.data.last = start;
-      return this.startCallback(event, this.data);
+      this.startCallback(event, this.data);
+      return true;
     };
 
     TouchProxy.prototype.continueTouching = function(event) {
@@ -1951,12 +1952,14 @@
       last.x = event.originalEvent.touches[0].pageX;
       last.y = event.originalEvent.touches[0].pageY;
       this.data.last = last;
-      return this.continueCallback(event, this.data);
+      this.continueCallback(event, this.data);
+      return true;
     };
 
     TouchProxy.prototype.finishTouching = function(event) {
       console.log(this.el);
-      return this.finishCallback(event, this.data);
+      this.finishCallback(event, this.data);
+      return true;
     };
 
     return TouchProxy;
@@ -2262,12 +2265,11 @@
       }
       if (this.toggle_done) {
         this.item.done = !this.item.done;
-        this.item.save();
+        return this.item.save();
       } else {
         this.transformTranslateX(0, true);
-        this.hovering = false;
+        return this.hovering = false;
       }
-      return true;
     };
 
     TaskItem.prototype.checkTouchStatus = function() {
