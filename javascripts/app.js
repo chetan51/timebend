@@ -1943,8 +1943,7 @@
     },
     touchable_continueTouching: function(event) {
       this.touch_last.x = event.originalEvent.touches[0].pageX;
-      this.touch_last.y = event.originalEvent.touches[0].pageY;
-      return this.continueTouching(event);
+      return this.touch_last.y = event.originalEvent.touches[0].pageY;
     },
     touchable_finishTouching: function(event) {
       return this.finishTouching(event);
