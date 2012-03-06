@@ -2214,11 +2214,9 @@
       this.touch_data = data;
       dx = data.last.x - data.start.x;
       if (!this.hovering && !app.global_scrolling && Math.abs(dx) > TaskItem.config.touch_swipe_dist_tolerance) {
-        console.log("setting swiping");
         this.swiping = true;
       }
       if (this.swiping) {
-        console.log("swiping");
         dx = dx > 0 ? dx : 0;
         dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
         this.transformTranslateX(dx);
@@ -2504,7 +2502,8 @@
     }
 
     App.prototype.startTouching = function(event, data) {
-      return this.global_scrolling = false;
+      console.log(this.global_scrolling);
+      return this.global_scrolling = true;
     };
 
     App.prototype.continueTouching = function(event, data) {
