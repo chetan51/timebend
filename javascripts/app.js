@@ -2497,13 +2497,13 @@
     };
 
     Tasks.prototype.startTouching = function(event, data) {
-      return this.swiping = false;
+      return this.swiping = true;
     };
 
     Tasks.prototype.continueTouching = function(event, data) {
       var dy;
       dy = data.last.y - data.start.y;
-      if (dy > 0) this.swiping = true;
+      if (dy < 0) this.swiping = false;
       if (this.swiping) return this.newTaskBarSwiping(dy);
     };
 
