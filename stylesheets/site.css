@@ -60,6 +60,7 @@ a {
 #wrapper {
   overflow-x: hidden;
   overflow-y: scroll;
+  padding-top: 60px;
   padding-bottom: 40px; }
 
 #templates {
@@ -103,7 +104,11 @@ a {
       right: 0; }
 
 #status {
-  height: 60px; }
+  position: fixed;
+  top: 0;
+  height: 60px;
+  width: 100%;
+  z-index: 1000; }
   #status .content {
     height: 58px;
     background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #556270), color-stop(100%, #333333));
@@ -112,10 +117,10 @@ a {
     background: -o-linear-gradient(top, #556270, #333333);
     background: -ms-linear-gradient(top, #556270, #333333);
     background: linear-gradient(top, #556270, #333333);
-    -moz-box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 7px;
-    -webkit-box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 7px;
-    -o-box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 7px;
-    box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 7px; }
+    -moz-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 3px 1px;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 3px 1px;
+    -o-box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 3px 1px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 3px 1px; }
     #status .content #day-start, #status .content #day-end {
       position: absolute;
       top: 12px;
