@@ -112,10 +112,10 @@ a {
     background: -o-linear-gradient(top, #556270, #333333);
     background: -ms-linear-gradient(top, #556270, #333333);
     background: linear-gradient(top, #556270, #333333);
-    -moz-box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.8);
-    -webkit-box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.8);
-    -o-box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.8);
-    box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.8); }
+    -moz-box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 7px;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 7px;
+    -o-box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 7px;
+    box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 7px; }
     #status .content #day-start, #status .content #day-end {
       position: absolute;
       top: 12px;
@@ -153,10 +153,10 @@ a {
     height: 38px;
     background: #fff;
     line-height: 38px;
-    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    -o-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px;
+    -o-box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px;
+    box-shadow: rgba(0, 0, 0, 0.4) 0 1px 3px;
     color: #333; }
     .task .content .name input[type="text"] {
       color: #333; }
@@ -167,10 +167,10 @@ a {
         color: #fff; }
     .task .content.done {
       background-color: #eee !important;
-      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      -o-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      -moz-box-shadow: rgba(0, 0, 0, 0.1) 0 1px 3px;
+      -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0 1px 3px;
+      -o-box-shadow: rgba(0, 0, 0, 0.1) 0 1px 3px;
+      box-shadow: rgba(0, 0, 0, 0.1) 0 1px 3px;
       color: #aaa; }
       .task .content.done .name input[type="text"] {
         color: #aaa;
