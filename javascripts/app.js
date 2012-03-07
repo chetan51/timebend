@@ -2292,19 +2292,23 @@
     };
 
     TaskItem.prototype.taskSwiping = function(dx) {
-      var updated_toggle_done;
+      var extra_dx, gutter_width, updated_toggle_done;
       app.log("task swiping: " + dx);
+      gutter_width = TaskItem.config.gutter_width;
       dx = dx > 0 ? dx : 0;
-      dx = dx < TaskItem.config.gutter_width ? dx : TaskItem.config.gutter_width;
+      if (dx > gutter_width) {
+        extra_dx = dx - gutter_width;
+        dx = gutter_width + (extra_dx / ((extra_dx / 50) + 1));
+      }
       this.transformContentMoveHoriz(dx);
       if (dx > 0) {
         this.toggle_done = typeof this.toggle_done === "undefined" ? false : this.toggle_done;
         if (this.item.done) {
-          this.transformCheckmarkOpacity(1 - (dx / TaskItem.config.gutter_width));
+          this.transformCheckmarkOpacity(1 - (dx / gutter_width));
         } else {
-          this.transformCheckmarkOpacity(dx / TaskItem.config.gutter_width);
+          this.transformCheckmarkOpacity(dx / gutter_width);
         }
-        updated_toggle_done = dx === TaskItem.config.gutter_width ? true : false;
+        updated_toggle_done = dx >= gutter_width ? true : false;
         if (updated_toggle_done === !this.toggle_done) {
           if (this.item.done) {
             if (updated_toggle_done) {
