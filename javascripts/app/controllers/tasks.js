@@ -22,7 +22,7 @@
       this["delete"] = __bind(this["delete"], this);
       this.newTaskBarSwipeReleased = __bind(this.newTaskBarSwipeReleased, this);
       this.newTaskBarSwiping = __bind(this.newTaskBarSwiping, this);
-      this.newTaskBarTouched = __bind(this.newTaskBarTouched, this);
+      this.startCreatingNewTask = __bind(this.startCreatingNewTask, this);
       this.finishTouching = __bind(this.finishTouching, this);
       this.continueTouching = __bind(this.continueTouching, this);
       this.startTouching = __bind(this.startTouching, this);
@@ -90,14 +90,15 @@
     };
 
     Tasks.prototype.startTouching = function(event, data) {
-      return this.newTaskBarTouched();
+      return this.swiping = false;
     };
 
     Tasks.prototype.continueTouching = function(event, data) {
       var dy;
       event.preventDefault();
       dy = data.last.y - data.start.y;
-      return this.newTaskBarSwiping(dy);
+      if (dy > 0) this.swiping = true;
+      if (this.swiping) return this.newTaskBarSwiping(dy);
     };
 
     Tasks.prototype.finishTouching = function(event, data) {
@@ -106,9 +107,8 @@
       return this.newTaskBarSwipeReleased(dy);
     };
 
-    Tasks.prototype.newTaskBarTouched = function() {
+    Tasks.prototype.startCreatingNewTask = function() {
       var after_task;
-      app.log("new task touched");
       this.task = null;
       this.task_item = null;
       this.create = false;
@@ -132,6 +132,10 @@
     Tasks.prototype.newTaskBarSwiping = function(dy) {
       var rotate_angle, rotate_x, translate_y;
       app.log("new task swiping: " + dy);
+      if (!this.started_creating) {
+        this.startCreatingNewTask();
+        this.started_creating = true;
+      }
       rotate_angle = Math.asin(dy / TaskItem.config.height) * 360 / (2 * Math.PI);
       rotate_x = dy > 0 ? -90 + rotate_angle : -90;
       rotate_x = rotate_x < 0 ? rotate_x : 0;
@@ -172,7 +176,7 @@
         this.new_task_bar.css({
           y: 0
         });
-        return this.task_item.startEditingName();
+        this.task_item.startEditingName();
       } else {
         after_task.transition({
           y: 0
@@ -180,10 +184,11 @@
         this.new_task_bar.transition({
           y: 0
         });
-        return this.task_item.transformFlipVert(-90, true, function() {
+        this.task_item.transformFlipVert(-90, true, function() {
           return _this.task_item.remove();
         });
       }
+      return this.started_creating = false;
     };
 
     Tasks.prototype["delete"] = function(task) {
