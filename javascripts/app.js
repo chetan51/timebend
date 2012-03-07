@@ -2502,7 +2502,6 @@
 
     Tasks.prototype.continueTouching = function(event, data) {
       var dy;
-      event.preventDefault();
       dy = data.last.y - data.start.y;
       if (dy > 0) this.swiping = true;
       if (this.swiping) return this.newTaskBarSwiping(dy);
@@ -2539,6 +2538,7 @@
     Tasks.prototype.newTaskBarSwiping = function(dy) {
       var rotate_angle, rotate_x, translate_y;
       app.log("new task swiping: " + dy);
+      event.preventDefault();
       if (!this.started_creating) {
         this.startCreatingNewTask();
         this.started_creating = true;
