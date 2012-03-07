@@ -45,6 +45,17 @@
     return text;
   };
 
+  window.formatMinutes = function(minutes) {
+    var decimal_places, hours;
+    hours = minutes / 60;
+    if (hours >= 1) {
+      decimal_places = hours % 1 ? 1 : 0;
+      return hours.toFixed(decimal_places) + "h";
+    } else {
+      return minutes.toFixed(0) + "m";
+    }
+  };
+
   window.simplifyTimeString = function(time_string) {
     return time_string.replace(":00", "");
   };

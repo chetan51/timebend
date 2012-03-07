@@ -113,7 +113,7 @@
       this.task_item = null;
       this.create = false;
       this.task = Task.init({
-        duration: 1,
+        duration: 60,
         name: "Pull to create task",
         order_index: Task.unfinished().length
       });
@@ -130,9 +130,10 @@
     };
 
     Tasks.prototype.newTaskBarSwiping = function(dy) {
-      var rotate_x, translate_y;
+      var rotate_angle, rotate_x, translate_y;
       app.log("new task swiping: " + dy);
-      rotate_x = dy > 0 ? -90 + (90 * dy / TaskItem.config.height) : -90;
+      rotate_angle = Math.asin(dy / TaskItem.config.height) * 360 / (2 * Math.PI);
+      rotate_x = dy > 0 ? -90 + rotate_angle : -90;
       rotate_x = rotate_x < 0 ? rotate_x : 0;
       this.task_item.transformFlipVert(rotate_x);
       translate_y = dy < TaskItem.config.height ? dy : TaskItem.config.height;

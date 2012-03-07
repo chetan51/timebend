@@ -53,6 +53,17 @@
     return text;
   };
 
+  window.formatMinutes = function(minutes) {
+    var decimal_places, hours;
+    hours = minutes / 60;
+    if (hours >= 1) {
+      decimal_places = hours % 1 ? 1 : 0;
+      return hours.toFixed(decimal_places) + "h";
+    } else {
+      return minutes.toFixed(0) + "m";
+    }
+  };
+
   window.simplifyTimeString = function(time_string) {
     return time_string.replace(":00", "");
   };
@@ -2073,7 +2084,7 @@
 
     TaskItem.config = {
       height: 40,
-      gutter_width: 36,
+      gutter_width: 40,
       touch_tap_time_tolerance: 500,
       touch_tap_dist_tolerance: 5,
       touch_hold_dist_tolerance: 5,
@@ -2094,6 +2105,8 @@
     };
 
     function TaskItem() {
+      this.animateDuration = __bind(this.animateDuration, this);
+      this.updateDurationColor = __bind(this.updateDurationColor, this);
       this.durationTapped = __bind(this.durationTapped, this);
       this.taskHeld = __bind(this.taskHeld, this);
       this.taskSwipeReleased = __bind(this.taskSwipeReleased, this);
@@ -2133,20 +2146,21 @@
       if (item) this.item = item;
       this.item.controller = this;
       this.html(this.template(this.item));
+      this.updateDurationColor();
       return this;
     };
 
     TaskItem.prototype.creating = function() {
       return this.el.css({
         'height': '0',
-        'z-index': '-1'
+        'z-index': '10'
       });
     };
 
     TaskItem.prototype.created = function() {
       return this.el.css({
         'height': TaskItem.config.height + 'px',
-        'z-index': '1'
+        'z-index': '100'
       });
     };
 
@@ -2334,7 +2348,50 @@
     };
 
     TaskItem.prototype.durationTapped = function() {
-      return app.log("duration tapped");
+      var new_duration,
+        _this = this;
+      app.log("duration tapped");
+      new_duration = 60;
+      if (this.item.duration > 30) {
+        new_duration = 30;
+      } else if (this.item.duration > 15) {
+        new_duration = 15;
+      }
+      return this.animateDuration(this.item.duration, new_duration, 500, function() {
+        _this.item.duration = new_duration;
+        return _this.item.save();
+      });
+    };
+
+    TaskItem.prototype.updateDurationColor = function(duration_minutes) {
+      var background_opacity;
+      duration_minutes = duration_minutes ? duration_minutes : this.item.duration;
+      background_opacity = duration_minutes / 60;
+      return this.duration.css('background-color', "rgba(203,222,228, " + background_opacity + ")");
+    };
+
+    TaskItem.prototype.animateDuration = function(from_minutes, to_minutes, animation_length, callback) {
+      var animation_start_time, delta_minutes, last_update_time, update,
+        _this = this;
+      delta_minutes = to_minutes - from_minutes;
+      animation_start_time = new Date();
+      last_update_time = animation_start_time;
+      update = function() {
+        var current_minutes, time_elapsed;
+        time_elapsed = last_update_time - animation_start_time;
+        current_minutes = from_minutes + (delta_minutes * time_elapsed / animation_length);
+        _this.duration.html(formatMinutes(current_minutes));
+        _this.updateDurationColor(current_minutes);
+        if (time_elapsed > animation_length) {
+          return callback();
+        } else {
+          last_update_time = new Date();
+          return delay(10, function() {
+            return update();
+          });
+        }
+      };
+      return update();
     };
 
     return TaskItem;
@@ -2459,7 +2516,7 @@
       this.task_item = null;
       this.create = false;
       this.task = Task.init({
-        duration: 1,
+        duration: 60,
         name: "Pull to create task",
         order_index: Task.unfinished().length
       });
@@ -2476,9 +2533,10 @@
     };
 
     Tasks.prototype.newTaskBarSwiping = function(dy) {
-      var rotate_x, translate_y;
+      var rotate_angle, rotate_x, translate_y;
       app.log("new task swiping: " + dy);
-      rotate_x = dy > 0 ? -90 + (90 * dy / TaskItem.config.height) : -90;
+      rotate_angle = Math.asin(dy / TaskItem.config.height) * 360 / (2 * Math.PI);
+      rotate_x = dy > 0 ? -90 + rotate_angle : -90;
       rotate_x = rotate_x < 0 ? rotate_x : 0;
       this.task_item.transformFlipVert(rotate_x);
       translate_y = dy < TaskItem.config.height ? dy : TaskItem.config.height;

@@ -49,13 +49,12 @@ body {
   width: 100%;
   padding: 0;
   margin: 0;
-  background-color: #000;
-  color: #fff;
+  background: #f2f2f2;
+  color: #333;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   overflow-x: hidden; }
 
 a {
-  color: #fff;
   text-decoration: none; }
 
 #wrapper {
@@ -67,11 +66,13 @@ a {
   display: none; }
 
 #todo, #done {
+  position: relative;
   width: 100%;
   top: 0;
   left: 0;
   -webkit-perspective: 1000;
-  -webkit-backface-visibility: hidden; }
+  -webkit-backface-visibility: hidden;
+  z-index: 100; }
 
 #status, .task {
   -webkit-backface-visibility: hidden;
@@ -92,7 +93,7 @@ a {
     z-index: -1000; }
     #status .behind .check, #status .behind .cross, .task .behind .check, .task .behind .cross {
       display: block;
-      width: 36px;
+      width: 40px;
       height: 40px;
       position: absolute;
       top: 0; }
@@ -105,12 +106,22 @@ a {
   height: 60px; }
   #status .content {
     height: 58px;
-    background-color: #00AA33; }
+    background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #556270), color-stop(100%, #333333));
+    background: -webkit-linear-gradient(top, #556270, #333333);
+    background: -moz-linear-gradient(top, #556270, #333333);
+    background: -o-linear-gradient(top, #556270, #333333);
+    background: -ms-linear-gradient(top, #556270, #333333);
+    background: linear-gradient(top, #556270, #333333);
+    -moz-box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.8);
+    -webkit-box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.8);
+    -o-box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.8);
+    box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.8); }
     #status .content #day-start, #status .content #day-end {
       position: absolute;
       top: 12px;
-      color: #111;
-      text-align: center; }
+      text-align: center;
+      color: #999;
+      text-shadow: #111111 0px -1px 1px; }
       #status .content #day-start .time, #status .content #day-end .time {
         font-size: 18px; }
       #status .content #day-start .suffix, #status .content #day-end .suffix {
@@ -126,25 +137,43 @@ a {
       padding-left: 40px;
       padding-right: 40px;
       padding-top: 5px;
-      text-align: center; }
+      text-align: center;
+      color: #fff;
+      text-shadow: #333333 2px 1px 0; }
       #status .content #reserve-left .time {
         font-size: 30px; }
       #status .content #reserve-left .label {
         font-size: 12px; }
 
 .task {
-  height: 40px; }
+  position: relative;
+  height: 40px;
+  z-index: 100; }
   .task .content {
     height: 38px;
-    background-color: #0086F3;
-    line-height: 38px; }
+    background: #fff;
+    line-height: 38px;
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    -o-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    color: #333; }
+    .task .content .name input[type="text"] {
+      color: #333; }
     .task .content.green {
-      background-color: #00AA33 !important; }
+      background-color: #36AA1F !important;
+      color: #fff; }
+      .task .content.green .name input[type="text"] {
+        color: #fff; }
     .task .content.done {
-      background-color: #222 !important;
-      color: #555; }
+      background-color: #eee !important;
+      -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      -o-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      color: #aaa; }
       .task .content.done .name input[type="text"] {
-        color: #555;
+        color: #aaa;
         text-decoration: line-through; }
   .task .name {
     position: relative;
@@ -153,7 +182,6 @@ a {
       width: 100%;
       border: none;
       background: transparent;
-      color: #fff;
       font-size: 16px;
       font-weight: bold;
       padding: 0;
@@ -168,14 +196,22 @@ a {
     height: 40px;
     text-align: center;
     line-height: 40px;
-    background-color: rgba(255, 255, 255, 0.15); }
+    font-size: 14px;
+    background-color: rgba(203, 222, 228, 0.4);
+    color: #666; }
 
 #new-task, #clear-tasks {
-  background: #111;
+  position: relative;
   height: 40px;
-  color: #777;
+  background: #ddd;
+  opacity: .5;
   font-size: 18px;
   font-weight: bold;
   text-align: center;
   line-height: 40px;
-  -webkit-user-select: none; }
+  -moz-box-shadow: rgba(0, 0, 0, 0.1) 0 0 3px 3px inset;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0 0 3px 3px inset;
+  -o-box-shadow: rgba(0, 0, 0, 0.1) 0 0 3px 3px inset;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 0 3px 3px inset;
+  -webkit-user-select: none;
+  z-index: 50; }
