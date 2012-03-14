@@ -24,6 +24,7 @@
     <script src="javascripts/lib/jquery.transit.min.js" type="text/javascript"></script>
     <script src="javascripts/lib/jquery.fingers/lib/jquery.fingers.js" type="text/javascript"></script>
     <script src="javascripts/lib/underscore-min.js" type="text/javascript"></script>
+    <script src="javascripts/lib/moment.js" type="text/javascript"></script>
     <script src="javascripts/app.js" type="text/javascript"></script>
     
     <script src="javascripts/lib/phantom-limb.js" type="text/javascript"></script>
@@ -64,7 +65,7 @@
           <span class="time">00:00</span>
           <span class="suffix">am</span>
         </div>
-        <input type="date" />
+        <input type="time" />
         <div class="label">day start</div>
       </div>
       <div id="reserve-left">
@@ -78,8 +79,8 @@
           <span class="time">00:00</span>
           <span class="suffix">am</span>
         </div>
+        <input type="time" />
         <div class="label">day end</div>
-        <input type="date" />
       </div>
     </div>
     <div class="behind">
@@ -100,7 +101,7 @@
   <div id="task-template">
   <div class="content{{ if(task.done) print(' done'); }}">
     <div class="name"><input type="text" value="{{= task.name }}"></div>
-    <div class="duration">{{= formatMinutes(task.duration) }}</div>
+    <div class="duration">{{= formatMinutesIntoCounter(task.duration) }}</div>
   </div>
   <div class="behind">
     <img class="check" src="images/check.png"/>
