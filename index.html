@@ -100,7 +100,10 @@
 <div id="templates">
   <div id="task-template">
   <div class="content{{ if(task.done) print(' done'); }}">
-    <div class="name"><input type="text" value="{{= task.name }}"></div>
+    <div class="name">
+      <div class="display">{{= task.name }}</div>
+      <input type="text" value="{{= task.name }}">
+    </div>
     <div class="duration">{{= formatMinutesIntoCounter(task.duration) }}</div>
   </div>
   <div class="behind">
