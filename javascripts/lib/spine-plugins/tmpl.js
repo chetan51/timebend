@@ -1,0 +1,1 @@
+(function(){$.fn.item=function(){var a;return a=$(this),a=a.data("item")||(typeof a.tmplItem=="function"?a.tmplItem().data:void 0),a!=null&&typeof a.reload=="function"&&a.reload(),a},$.fn.forItem=function(a){return this.filter(function(){var b;return b=$(this).item(),(typeof a.eql=="function"?a.eql(b):void 0)||a===b})}}).call(this);
